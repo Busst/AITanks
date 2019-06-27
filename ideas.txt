@@ -1,0 +1,10 @@
+game.js- displays games/ handles all rendering
+server.js- handles server / game rules
+map_gen.js- handles map gen
+	start with a pre gen map until ai starts working
+gen map of walls/bullets/tanks
+	walls will always be on outskirts
+	random gen them start with a seed tho
+
+
+

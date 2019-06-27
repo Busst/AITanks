@@ -6,6 +6,7 @@
     var app = express();
     var server = http.Server(app);
     var io = socketIO(server);
+    const map_gen = require('./static/MapGen');
     app.set('port', 5000);
     app.use('/static', express.static(__dirname + '/static'));
     // Routing
@@ -21,38 +22,15 @@
     io.on('connection', function(socket) {
     });
 
+
+    var gen = new map_gen(1);
+    
+
     var players = {};
-    io.on('connection', function(socket) {
-        socket.on('new player', function() {
-            players[socket.id] = {
-                x: 300,
-                y: 300
-            };
-        });
-        socket.on('movement', function(data) {
-            var player = players[socket.id] || {};
-            if (data.left) {
-                if (player.x > 0 + 10){
-                    player.x -= 5;
-                }
-            }
-            if (data.up) {
-                if (player.y > 0 + 10){
-                    player.y -= 5;
-                }
-            }
-            if (data.right) {
-                if (player.x < 800 - 10){
-                    player.x += 5;
-                }
-            }
-            if (data.down) {
-                if (player.y < 600 - 10){
-                    player.y += 5;
-                }
-            }
-        });
-    });
+    console.log(gen.get_seed());
+    
     setInterval(function() {
-        io.sockets.emit('state', players);
+        
+        io.sockets.emit('update', players);
     }, 1000 / 60);
+
