@@ -21,7 +21,7 @@
             
         }
         context.fillStyle = 'black'
-        for (i in walls) {
+        for (var i in walls) {
             var wall = walls[i];
             context.lineWidth = 10;
             context.strokeRect(wall.x+3, 0, 1, 50)

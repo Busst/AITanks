@@ -7,6 +7,8 @@
     var server = http.Server(app);
     var io = socketIO(server);
     const map_gen = require('./static/MapGen');
+    const p = require('./static/player');
+    const move_piece = require('./static/Move');
     app.set('port', 5000);
     app.use('/static', express.static(__dirname + '/static'));
     // Routing
@@ -24,12 +26,16 @@
 
 
     var gen = new map_gen(1);
+    var move_player = new move_piece(7);
     
 
     var players = {};
-    console.log(gen.get_seed());
+    players['1'] = new p('1', 100, 100, 21);
+    players['2'] = new p('2', 200, 200, 5);
+    players['3'] = new p('3', 300, 300, 15);
     
     setInterval(function() {
+        move_player.update_players(players);
         
         io.sockets.emit('update', players);
     }, 1000 / 60);
