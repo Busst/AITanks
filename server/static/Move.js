@@ -10,8 +10,9 @@ class Move {
         for (var id in players) {
             var player = players[id];
             var rr = this.get_random_move(player.speed);
-                player.addX(rr.x );
-                player.addY(rr.y);
+            player.addX(rr.x);
+            player.addY(rr.y);
+            
         }
     }
 

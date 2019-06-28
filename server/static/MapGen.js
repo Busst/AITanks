@@ -1,24 +1,83 @@
 'use strict'
 
 class MapGen {
-    constructor (seed){
+    constructor (seed, height, width){
         this.seed = seed;
+        this.height = height;
+        this.width = width;
     }
 
-    generate_map_array() {
-        var map_array = {};
-        map_array['1'] = {
-            x: 10,
-            y: 10,
-            w: 1,
-            h: 800,
+    generate_map() {
+        console.log("generating map");
+        var map = {};
+        
+        for (var i = 0; i < this.width; i++) {
+            for (var j = 0; j < this.height; j++) {
+                var tile = Math.floor(Math.random(this.seed) * 15 + 1);
+                map[""+ i + j] = { tile: tile, x: i, y: j};
+            }
         }
+        this.addWalls(map);
+        console.log("done. returning map...");
+        return map;
+        
+    }
+    //0 + num goes to left
 
+    addWalls(map) {
+        
+        for (var i = 0; i < this.width; i++){
+            if (map[""+0+i] === undefined) {
+                map[""+0+i] = { tile: 1, x: 0, y: i};
+            } else {
+                if ((map[""+0+i].tile) % 2 != 1) {
+                    
+                    map[""+0+i].tile += 1;
+                }
+            }
+        }
+        for (var i = 0; i < this.width; i++){
+            if (map[""+ (this.width - 1) + i] === undefined) {
+                map[""+ (this.width - 1) + i] = { tile: 4, x: 0, y: i};
+            } else {
+                if ((map[""+ (this.width - 1) + i].tile >> 2) % 2 != 1) {
+                    
+                    map[""+ (this.width - 1) + i].tile += 4;
+                }
+            }
+        }
+        for (var i = 0; i < this.height; i++){
+            if (map[""+i+0] === undefined) {
+                map[""+i+0] = { tile: 2, x: 0, y: i};
+            } else {
+                if ((map[""+i+0].tile >> 1) % 2 != 1) {
+                    
+                    map[""+i+0].tile += 2;
+                }
+            }
+        }
+        for (var i = 0; i < this.height; i++){
+            if (map["" + i + (this.width - 1)] === undefined) {
+                map["" + i + (this.width - 1)] = { tile: 8, x: 0, y: i};
+            } else {
+                if ((map["" + i + (this.width - 1)].tile >> 3) % 2 != 1) {
+                    
+                    map["" + i + (this.width - 1)].tile += 8;
+                }
+            }
+        }
+        
+        
+    
+        return;
+    
     }
 
     get_seed(){
         return this.seed;
     }
 }
+
+
 
 module.exports = MapGen;
