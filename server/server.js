@@ -28,7 +28,7 @@
     var gen = new map_gen(8, 8);
     var move_player = new move_piece(100);
     var map = gen.generate_map();
-
+    
     var players = {};
     players['1'] = new p('1', 100, 100, 5, 'red');
     players['2'] = new p('2', 200, 200, 5, 'green');
@@ -42,4 +42,4 @@
         var data = {players: players, map: map };
         io.emit('update', data);
     }, 1000 / 60);
-
+    

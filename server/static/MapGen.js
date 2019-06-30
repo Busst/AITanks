@@ -15,14 +15,14 @@ class MapGen {
                 map[""+ i + j] = { tile: tile, x: i, y: j};
             }
         }
-        this.addWalls(map);
+        this.addOuterWalls(map);
         
         return map;
         
     }
     //0 + num goes to left
 
-    addWalls(map) {
+    addOuterWalls(map) {
         
         for (var i = 0; i < this.width; i++){
             if (map[""+0+i] === undefined) {
@@ -67,10 +67,13 @@ class MapGen {
     
     }
 
-    pathfinder(start_x, start_y, end_x, end_y) {
+    pathfinder(map) {
+        var start_x = 0;
+        var start_y = 0;
+        var end_x = 4;
+        var end_y = 0;
+
         
-
-
 
     }
 
