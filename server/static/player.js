@@ -2,11 +2,12 @@
 
 
 class player {
-    constructor (id, x, y, speed) {
+    constructor (id, x, y, speed, color) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.speed = speed;
+        this.color = color;
     }
 
     getID(){

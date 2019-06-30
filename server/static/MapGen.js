@@ -1,8 +1,7 @@
 'use strict'
 
 class MapGen {
-    constructor (seed, height, width){
-        this.seed = seed;
+    constructor (height, width){
         this.height = height;
         this.width = width;
     }
@@ -10,15 +9,13 @@ class MapGen {
     generate_map() {
         console.log("generating map");
         var map = {};
-        
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
-                var tile = Math.floor(Math.random(this.seed) * 15 + 1);
+                var tile = Math.trunc(Math.random() * 15 + 1);
                 map[""+ i + j] = { tile: tile, x: i, y: j};
             }
         }
         this.addWalls(map);
-        console.log("done. returning map...");
         return map;
         
     }
@@ -31,7 +28,6 @@ class MapGen {
                 map[""+0+i] = { tile: 1, x: 0, y: i};
             } else {
                 if ((map[""+0+i].tile) % 2 != 1) {
-                    
                     map[""+0+i].tile += 1;
                 }
             }
@@ -41,7 +37,6 @@ class MapGen {
                 map[""+ (this.width - 1) + i] = { tile: 4, x: 0, y: i};
             } else {
                 if ((map[""+ (this.width - 1) + i].tile >> 2) % 2 != 1) {
-                    
                     map[""+ (this.width - 1) + i].tile += 4;
                 }
             }
@@ -51,7 +46,6 @@ class MapGen {
                 map[""+i+0] = { tile: 2, x: 0, y: i};
             } else {
                 if ((map[""+i+0].tile >> 1) % 2 != 1) {
-                    
                     map[""+i+0].tile += 2;
                 }
             }
@@ -61,7 +55,6 @@ class MapGen {
                 map["" + i + (this.width - 1)] = { tile: 8, x: 0, y: i};
             } else {
                 if ((map["" + i + (this.width - 1)].tile >> 3) % 2 != 1) {
-                    
                     map["" + i + (this.width - 1)].tile += 8;
                 }
             }
@@ -73,9 +66,6 @@ class MapGen {
     
     }
 
-    get_seed(){
-        return this.seed;
-    }
 }
 
 

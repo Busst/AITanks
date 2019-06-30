@@ -1,8 +1,8 @@
 
-    var CANVAS_WIDTH = 800;
-    var CANVAS_HEIGHT = 800;
-    var SQUARE_HEIGHT = CANVAS_HEIGHT / 8; //???
-    var SQUARE_WIDTH = CANVAS_WIDTH / 8;
+    var CANVAS_WIDTH = 600;
+    var CANVAS_HEIGHT = 600;
+    var SQUARE_HEIGHT = CANVAS_HEIGHT / 6; //???
+    var SQUARE_WIDTH = CANVAS_WIDTH / 6;
 
     var socket = io();
 
@@ -17,12 +17,18 @@
         var map = data.map;
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         
-        context.fillStyle = 'green';
         for (var id in players) {
             var player = players[id];
+            context.fillStyle = player.color;
             context.beginPath();
-            context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
+            context.rect(player.x, player.y, 10, 10);
+            //context.arc(player.x, player.y, 5, 0, 2 * Math.PI);
+            //context.fill();
             context.fill();
+            context.stroke();
+            //context.fillStyle = 'green';
+            //context.beginPath();
+
             
             
         }
