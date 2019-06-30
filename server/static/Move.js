@@ -97,7 +97,7 @@ class Move {
         var mapy = Math.trunc(y / 100);
 
         var tile = map['' + mapx + mapy].tile;
-        console.log("player " + player.id);
+        
         return this.relative_pos_in_square(x, y, mapx, mapy, tile);
         
         
@@ -116,28 +116,28 @@ class Move {
         //left wall
         if (tile % 2 > 0){
             if (rpx < 5) {
-                console.log("left wall touched");
+                //console.log("left wall touched");
                 state.left = true;
             }
         }
         //top
         if ((tile >> 1) % 2 > 0) {
             if (rpy < 5) {
-                console.log("top wall touched");
+                //console.log("top wall touched");
                 state.top = true;
             }
         } 
         //right
         if ((tile >> 2) % 2 > 0) {
             if (rpx > 90) {
-                console.log("right wall touched");
+                //console.log("right wall touched");
                 state.right = true;
             }
         } 
         //bot
         if ((tile >> 3) % 2 > 0) {
             if (rpy > 90) {
-                console.log("bot wall touched");
+                //console.log("bot wall touched");
                 state.bot = true;
             }
         } 

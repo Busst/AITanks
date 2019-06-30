@@ -61,6 +61,13 @@
                 context.rect(wall.x * SQUARE_WIDTH, wall.y * SQUARE_HEIGHT+draw_factor, draw_factor, draw_width);
             } 
             context.stroke();
+            if ((line_pos >> 4) % 2 > 0) {
+                context.fillStyle = 'green';
+                context.beginPath();
+                context.arc(wall.x * SQUARE_WIDTH + SQUARE_WIDTH / 2, wall.y * SQUARE_HEIGHT + SQUARE_HEIGHT / 2, 5, 0, 2 * Math.PI);
+                context.fill();
+                context.stroke();
+            }
         }
         
     });

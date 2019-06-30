@@ -31,7 +31,7 @@
     
     var players = {};
     players['1'] = new p('1', 100, 100, 5, 'red');
-    players['2'] = new p('2', 200, 200, 5, 'green');
+    players['2'] = new p('2', 200, 200, 5, '#F801CF');
     players['3'] = new p('3', 300, 300, 5, 'yellow');
     
     

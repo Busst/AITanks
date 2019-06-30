@@ -16,7 +16,7 @@ class MapGen {
             }
         }
         this.addOuterWalls(map);
-        
+        this.pathfinder(map);
         return map;
         
     }
@@ -73,8 +73,20 @@ class MapGen {
         var end_x = 4;
         var end_y = 0;
 
-        
+        map[this.returnKey(start_x, start_y)].tile += 16;
+        map[this.returnKey(end_x, end_y)].tile += 16;
 
+        this.traverse(start_x, start_y, end_x, end_y);
+
+    }
+
+    traverse(x, y, end_x, end_y){
+
+        
+    }
+
+    returnKey(x,y) {
+        return ""+x + y;
     }
 
 }
