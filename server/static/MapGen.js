@@ -16,6 +16,7 @@ class MapGen {
             }
         }
         this.addWalls(map);
+        
         return map;
         
     }
@@ -66,7 +67,15 @@ class MapGen {
     
     }
 
+    pathfinder(start_x, start_y, end_x, end_y) {
+        
+
+
+
+    }
+
 }
+
 
 
 
