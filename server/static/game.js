@@ -1,8 +1,8 @@
 
-    var CANVAS_WIDTH = 600;
-    var CANVAS_HEIGHT = 600;
-    var SQUARE_HEIGHT = CANVAS_HEIGHT / 6; //???
-    var SQUARE_WIDTH = CANVAS_WIDTH / 6;
+    var CANVAS_WIDTH = 800;
+    var CANVAS_HEIGHT = 800;
+    var SQUARE_HEIGHT = CANVAS_HEIGHT / 8; //???
+    var SQUARE_WIDTH = CANVAS_WIDTH / 8;
 
     var socket = io();
 

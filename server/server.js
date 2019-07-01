@@ -29,6 +29,7 @@
     var move_player = new move_piece(100);
     var map = gen.generate_map();
     
+    
     var players = {};
     players['1'] = new p('1', 100, 100, 5, 'red');
     players['2'] = new p('2', 200, 200, 5, '#F801CF');
@@ -37,9 +38,10 @@
     
     //console.log(map);
     setInterval(function() {
-        move_player.update_players(players, map);
-
+        //move_player.update_players(players, map);
+        
         var data = {players: players, map: map };
+        
         io.emit('update', data);
     }, 1000 / 60);
     

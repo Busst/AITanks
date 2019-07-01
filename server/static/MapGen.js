@@ -11,12 +11,13 @@ class MapGen {
         var map = {};
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
-                var tile = Math.trunc(Math.random() * 15 + 1);
+                var tile = /*Math.trunc(Math.random() * 15 + 1)*/0;
                 map[""+ i + j] = { tile: tile, x: i, y: j};
             }
         }
+        //this.addInnerWalls(map);
         this.addOuterWalls(map);
-        this.pathfinder(map);
+        //this.pathfinder(map);
         return map;
         
     }
@@ -29,16 +30,17 @@ class MapGen {
                 map[""+0+i] = { tile: 1, x: 0, y: i};
             } else {
                 if ((map[""+0+i].tile) % 2 != 1) {
-                    map[""+0+i].tile += 1;
+                    map[""+0+i].tile += 1;//1
                 }
             }
         }
         for (var i = 0; i < this.width; i++){
-            if (map[""+ (this.width - 1) + i] === undefined) {
-                map[""+ (this.width - 1) + i] = { tile: 4, x: 0, y: i};
+            var key = ""+ (this.width - 1) + i;
+            if (map[key] === undefined) {
+                map[key] = { tile: 4, x: 0, y: i};
             } else {
-                if ((map[""+ (this.width - 1) + i].tile >> 2) % 2 != 1) {
-                    map[""+ (this.width - 1) + i].tile += 4;
+                if ((map[key].tile >> 2) % 2 != 1) {
+                    map[key].tile += 4; //4
                 }
             }
         }
@@ -47,47 +49,37 @@ class MapGen {
                 map[""+i+0] = { tile: 2, x: 0, y: i};
             } else {
                 if ((map[""+i+0].tile >> 1) % 2 != 1) {
-                    map[""+i+0].tile += 2;
+                    map[""+i+0].tile += 2; //2
                 }
             }
         }
         for (var i = 0; i < this.height; i++){
-            if (map["" + i + (this.width - 1)] === undefined) {
-                map["" + i + (this.width - 1)] = { tile: 8, x: 0, y: i};
+            var key = "" + i + (this.width - 1);
+            if (map[key] === undefined) {
+                map[key] = { tile: 8, x: 0, y: i};
             } else {
-                if ((map["" + i + (this.width - 1)].tile >> 3) % 2 != 1) {
-                    map["" + i + (this.width - 1)].tile += 8;
+                if ((map[key].tile >> 3) % 2 != 1) {
+                    map[key].tile += 8; //8
                 }
             }
         }
         
-        
-    
         return;
     
     }
-
-    pathfinder(map) {
-        var start_x = 0;
-        var start_y = 0;
-        var end_x = 4;
-        var end_y = 0;
-
-        map[this.returnKey(start_x, start_y)].tile += 16;
-        map[this.returnKey(end_x, end_y)].tile += 16;
-
-        this.traverse(start_x, start_y, end_x, end_y);
-
-    }
-
-    traverse(x, y, end_x, end_y){
-
-        
-    }
+    //left === 1
+    //top === 2
+    //right === 4
+    //bot === 8
+    
 
     returnKey(x,y) {
         return ""+x + y;
     }
+
+
+
+
 
 }
 
