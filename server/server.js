@@ -38,7 +38,7 @@
     
     //console.log(map);
     setInterval(function() {
-        //move_player.update_players(players, map);
+        move_player.update_players(players, map);
         
         var data = {players: players, map: map };
         

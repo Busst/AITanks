@@ -141,6 +141,10 @@ class Move {
                 state.bot = true;
             }
         } 
+
+        if ((rpx > 91 || rpx < 3 || rpy > 91 || rpy < 3) && (state.left || state.right || state.top || state.bot)){
+            //console.log("in weird spot " + rpx + " " + rpy);
+        }
         return state;
         
     }
