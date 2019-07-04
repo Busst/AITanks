@@ -20,6 +20,7 @@ class MapGen {
         this.fixInnerWalls(map);
         this.startPruning(map);
         this.fixInnerWalls(map);
+        this.setSpawns(map);
         this.addOuterWalls(map);
         return map;
         
@@ -161,22 +162,184 @@ class MapGen {
     }
 
     setSpawns(map) {
-        var spawn_1 = {x: 0, y: 0};
-        var spawn_2 = {x: 4, y: 0};
-        var stack = [];
+        var start = {
+            x: 0,
+            y: 0,
+            g: 0,   //travel from last to here
+            h: this.getDistance(0,0,7,7)
+        };
+        var end = {
+            x: 0,
+            y: 7,
+            g: 0,   //travel from last to here
+            h: this.getDistance(0,0,7,7)
+        }
+        
+        var open = [];
+        var closed = [start, {x: 0, y: 3}, {x:1, y: 3}, {x: 2, y: 4}];
+
+
+
+        console.log(this.findPath(start, end, open, closed, map, 0));
 
         
     }
 
-    findPath(point_1, point_2, stack){
-        
+    testPath(point) {
+        var x = point.x;
+        var y = point.y;
 
+        if ((x === 0 && y === 3) || (x === 0 && y === 2)) {
+            return true;
+        }
+       
+        return false;
+    }
+
+    findPath(cur, end, open, closed, map, count){
+        
+        if (map[this.Key(cur.x, cur.y)].tile < 16)
+            map[this.Key(cur.x, cur.y)].tile += 16;
+        var tile = map[this.Key(cur.x, cur.y)].tile;
+        if (cur.x === end.x && cur.y === end.y) {
+            return true;
+        }
+        console.log(this.Key(cur.x, cur.y)+" "+this.checkWall('l', tile));
+        if (cur.x > 0) {
+            var p = {
+                x: cur.x - 1,
+                y: cur.y
+            };
+            if (!this.compareTo(p, closed)) {
+                open.push(p);
+            }
+
+        }
+
+        if (cur.y > 0) {
+            var p = {
+                x: cur.x,
+                y: cur.y - 1
+            };
+            if (!this.compareTo(p, closed)) {
+                open.push(p);
+            }
+
+        }
+        if (cur.x < this.width - 1) {
+            var p = {
+                x: cur.x + 1,
+                y: cur.y
+            };
+            if (!this.compareTo(p, closed)) {
+                open.push(p);
+            }
+
+        }
+        if (cur.y < this.height - 1) {
+            var p = {
+                x: cur.x,
+                y: cur.y + 1
+            };
+            if (!this.compareTo(p, closed)) {
+                open.push(p);
+            }
+
+        }
+        closed.push(cur);
+        if (open.length === 0) {
+            return false;
+        }
+        var new_cur = open.pop();
+        //console.log(this.stacksToString(open, closed));
+        return this.findPath(new_cur, end, open, closed, map, count + 1);
 
     }
+
+    stacksToString(open, closed) {
+        var str = "";
+        var i = 0;
+        var j = 0;
+        while (i < open.length || j < closed.length){
+            if (i < open.length) {
+                str += open[i].x + " " + open[i].y; 
+                str += "\t";
+                i++;
+            } else {
+                str += "\t";
+            }
+            if (j < closed.length) {
+                str += closed[j].x + " " + closed[j].y; 
+                j++;
+            } 
+            
+            str += "\n";
+        }
+        return str;
+    }
+
+    checkWall(dir, tile) {
+        //left
+        //top
+        //right
+        //bot
+        switch(dir) {
+            case 't': 
+                if ((tile >> 1)%2) {
+                    return false;
+                }
+            case 'l':
+                if ((tile)%2) {
+                    return false;
+                }
+            case 'r':
+                if ((tile >> 2)%2) {
+                    return false;
+                }
+            case 'b':
+                if ((tile >> 3)%2) {
+                    return false;
+                }
+            default:
+                return true;
+        }
+    }
+
+    compareTo(p, stack) {
+        for (var i = 0; i < stack.length; i++){
+            if (stack[i].x === p.x && stack[i].y === p.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    insertPoint(point, stack) {
+        if (this.testPath(point)){
+            return false;
+        }
+        for (var i = 0; i < stack.length; i++) {
+            if (stack[i].h >= point.h) {
+                if (!(stack[i].x === point.x && stack[i].y === point.y)) {
+                    stack.splice(i, 0, point);
+                    return true;
+                } else {
+                    return false;
+                }
+                
+            } 
+        }
+        //stack.apoint);
+        stack.push(point);
+        return true;
+    }
+
 
 
     getDistance(x1, y1, x2, y2) {
-        return Math.abs(x2 + y2 - x1 - y1);
+        return Math.abs(y1 - y2) + Math.abs(x1 - x2);
     }
 
 
