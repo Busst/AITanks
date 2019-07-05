@@ -17,12 +17,11 @@ class MapGen {
         }
         
 
-        this.fixInnerWalls(map);
         this.startPruning(map);
         this.fixInnerWalls(map);
-        this.setSpawns(map);
         this.addOuterWalls(map);
-        return map;
+        var players = this.setSpawns(map);
+        return {map, spawn: players};
         
     }
     //0 + num goes to left
@@ -77,40 +76,54 @@ class MapGen {
     //bot === 8     >>3%2
 
     fixInnerWalls(map){
-        var cur;
-        for (var i = 0; i < this.width; i++) {
+
+        for (var i = 0; i < this.width; i++){
             for (var j = 0; j < this.height; j++) {
-                var map_space = map[this.Key(i,j)];
-                var tile = map_space.tile;
-                var left_wall = (tile % 2);
-                var top_wall = ((tile >> 1) % 2);
-                var right_wall = ((tile >>2) % 2);
-                var bot_wall = ((tile >> 3) % 2);
-
-                if (left_wall != 0 && i > 0) {
-                    if ((map[this.Key(i - 1, j)].tile >> 2)% 2 === 0)
-                        map[this.Key(i - 1, j)].tile += 4;
-                } 
-                if (top_wall != 0 && j > 0) {
+                var key = this.Key(i,j);
+                var tile = map[key].tile;
+                if (tile % 2&& i > 0) {
+                    var left_key = this.Key(i-1,j);
+                    var left_tile = map[left_key].tile;
+                    if (!((left_tile >> 2) % 2)){
+                        map[left_key].tile = (map[left_key].tile + 4) % 16;
+                        //console.log("left " + this.Key(i-1,j)+" "+tile + " " + ((map[this.Key(i-1,j)].tile >> 2)%2));
+                    }
                     
-                    if ((map[this.Key(i, j - 1)].tile >> 3)% 2 === 0)
-                        map[this.Key(i, j - 1)].tile += 8;
-                
                 }
-                if (right_wall != 0 && i < this.width - 1) {
-                    if ((map[this.Key(i + 1, j)].tile)% 2 === 0)
-                        map[this.Key(i+1, j )].tile += 1;
-                        
-                }
-                if (bot_wall != 0 && j < this.height - 1) {
-                    if ((map[this.Key(i, j + 1)].tile >> 1) % 2 === 0)
-                        map[this.Key(i, j + 1)].tile += 1;
                 
-                       
+                if ((tile >> 1) % 2 && j > 0) {
+                    var top_key = this.Key(i,j-1);
+                    var top_tile = map[top_key].tile;
+                    if (!((top_tile >> 3) % 2)){
+                        map[top_key].tile = (map[top_key].tile + 8) % 16;
+                        //console.log("top " + this.Key(i+1,j)+" "+tile + " " + ((map[this.Key(i,j-1)].tile >> 3)%2));
+                    }
+                }
+                if ((tile >> 2) % 2&& i < this.width-1) {
+                    var right_key = this.Key(i+1,j);
+                    var right_tile = map[right_key].tile;
+                    if (!((right_tile) % 2)){
+                        map[right_key].tile = (map[right_key].tile + 1) % 16;
+                        //console.log("right " + this.Key(i+1,j)+" "+tile + " " + ((map[this.Key(i+1,j)].tile)%2));
+                    }
+                }
+                if ((tile >> 3) % 2 && j < this.height - 1) {
+                    var bot_key = this.Key(i,j+1);
+                    var bot_tile = map[bot_key].tile;
+                    if (!((bot_tile >> 1) % 2)){
+                        map[bot_key].tile = (map[bot_key].tile + 2) % 16;
+                        //console.log("adding ");
+                        //console.log("bot " + this.Key(i,j+1)+" "+tile + " " + ((map[this.Key(i,j+1)].tile >> 1)%2));
+                    }
+                    
                 }
 
+
+                map[key].tile = map[key].tile % 16;
             }
+
         }
+        
     }
 
     startPruning(map) {
@@ -163,25 +176,90 @@ class MapGen {
 
     setSpawns(map) {
         var start = {
-            x: 0,
-            y: 0,
-            g: 0,   //travel from last to here
-            h: this.getDistance(0,0,7,7)
+            x: 4,
+            y: 4
+        }
+
+        var p1x = Math.trunc(Math.random() * 7);
+        var p1y = Math.trunc(Math.random() * 7);
+        var p2x = Math.trunc(Math.random() * 7);
+        var p2y = Math.trunc(Math.random() * 7);
+        var p3x = Math.trunc(Math.random() * 7);
+        var p3y = Math.trunc(Math.random() * 7);
+        
+        while ((p1x === p2x && p2y === p1y) || (p1x === p3x && p3y === p1y) || (p2x === p3x && p2y === p3y) ) {
+                
+            if (p1x === p2x && p2y === p1y) {
+                p2x = Math.trunc(Math.random() * 7);
+                p2y = Math.trunc(Math.random() * 7);
+            } else {
+                p3x = Math.trunc(Math.random() * 7);
+                p3y = Math.trunc(Math.random() * 7);
+            }
+        }
+        var p1 = {
+            x: p1x,
+            y: p1y
         };
-        var end = {
-            x: 0,
-            y: 7,
-            g: 0,   //travel from last to here
-            h: this.getDistance(0,0,7,7)
+        var p2 = {
+            x: p2x,
+            y: p2y
+        };
+        var p3 = {
+            x: p3x,
+            y: p3y
+        };
+
+        var open = [];
+        var closed = [];
+
+
+
+        while (!this.findPath(p1, p2, open, closed, map)) {
+ 
+            var open = [];
+            var closed = [];
+            
+            p2x = Math.trunc(Math.random() * 7);
+            p2y = Math.trunc(Math.random() * 7);
+            while (p1x === p2x && p2y === p1y) {
+                
+                p2x = Math.trunc(Math.random() * 7);
+                p2y = Math.trunc(Math.random() * 7);
+            }
+            
+            p2 = {
+                x: p2x,
+                y: p2y
+            };
+            
+ 
+        }
+
+        while (!this.findPath(p1, p3, open, closed, map)) {
+ 
+            var open = [];
+            var closed = [];
+            
+            p3x = Math.trunc(Math.random() * 7);
+            p3y = Math.trunc(Math.random() * 7);
+            while (p1x === p3x && p3y === p1y || p2x === p3x && p2y === p3y) {
+                
+                p3x = Math.trunc(Math.random() * 7);
+                p3y = Math.trunc(Math.random() * 7);
+            }
+            
+            p3 = {
+                x: p3x,
+                y: p3y
+            };
+            
+ 
         }
         
-        var open = [];
-        var closed = [start, {x: 0, y: 3}, {x:1, y: 3}, {x: 2, y: 4}];
 
 
-
-        console.log(this.findPath(start, end, open, closed, map, 0));
-
+        return {p1, p2, p3};
         
     }
 
@@ -189,8 +267,11 @@ class MapGen {
         var x = point.x;
         var y = point.y;
 
-        if ((x === 0 && y === 3) || (x === 0 && y === 2)) {
-            return true;
+        if ((x === 0 && y === 1) || (x === 0 && y === 2)) {
+            //return true;
+        }
+        if (y === 0 && x === 1){
+            //return true;
         }
        
         return false;
@@ -198,54 +279,63 @@ class MapGen {
 
     findPath(cur, end, open, closed, map, count){
         
-        if (map[this.Key(cur.x, cur.y)].tile < 16)
-            map[this.Key(cur.x, cur.y)].tile += 16;
+        
         var tile = map[this.Key(cur.x, cur.y)].tile;
+        //if (tile < 16)
+        //    map[this.Key(cur.x, cur.y)].tile += 16;
         if (cur.x === end.x && cur.y === end.y) {
             return true;
         }
-        console.log(this.Key(cur.x, cur.y)+" "+this.checkWall('l', tile));
-        if (cur.x > 0) {
+        //var str = "" + this.Key(cur.x, cur.y) + " " + tile+ "\n";
+        if (cur.x > 0 && !(tile % 2)) {
+            //str += "\tleft wall " + (tile % 2) + "\n";
             var p = {
                 x: cur.x - 1,
                 y: cur.y
             };
-            if (!this.compareTo(p, closed)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open) && !this.testPath(p)) {
                 open.push(p);
             }
 
         }
 
-        if (cur.y > 0) {
+        if (cur.y > 0 && !((tile >> 1) % 2)) {
+            //str += "\ttop wall " + ((tile >> 1) % 2) + "\n";
+            
             var p = {
                 x: cur.x,
                 y: cur.y - 1
             };
-            if (!this.compareTo(p, closed)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open)  && !this.testPath(p)) {
                 open.push(p);
             }
 
         }
-        if (cur.x < this.width - 1) {
+        if (cur.x < this.width - 1 && !((tile >> 2) % 2) ) {
+            //str += "\tright wall " + ((tile >> 2) % 2) + "\n";
+            
             var p = {
                 x: cur.x + 1,
                 y: cur.y
             };
-            if (!this.compareTo(p, closed)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open) && !this.testPath(p)) {
                 open.push(p);
             }
 
         }
-        if (cur.y < this.height - 1) {
+        if (cur.y < this.height - 1 && !((tile >> 3) % 2)) {
+            //str += "\tbot wall " + ((tile >> 3) % 2) + "\n";
+            
             var p = {
                 x: cur.x,
                 y: cur.y + 1
             };
-            if (!this.compareTo(p, closed)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open) && !this.testPath(p)) {
                 open.push(p);
             }
 
         }
+        //console.log(str);
         closed.push(cur);
         if (open.length === 0) {
             return false;
@@ -278,32 +368,6 @@ class MapGen {
         return str;
     }
 
-    checkWall(dir, tile) {
-        //left
-        //top
-        //right
-        //bot
-        switch(dir) {
-            case 't': 
-                if ((tile >> 1)%2) {
-                    return false;
-                }
-            case 'l':
-                if ((tile)%2) {
-                    return false;
-                }
-            case 'r':
-                if ((tile >> 2)%2) {
-                    return false;
-                }
-            case 'b':
-                if ((tile >> 3)%2) {
-                    return false;
-                }
-            default:
-                return true;
-        }
-    }
 
     compareTo(p, stack) {
         for (var i = 0; i < stack.length; i++){
@@ -313,30 +377,6 @@ class MapGen {
         }
         return false;
     }
-
-
-
-    insertPoint(point, stack) {
-        if (this.testPath(point)){
-            return false;
-        }
-        for (var i = 0; i < stack.length; i++) {
-            if (stack[i].h >= point.h) {
-                if (!(stack[i].x === point.x && stack[i].y === point.y)) {
-                    stack.splice(i, 0, point);
-                    return true;
-                } else {
-                    return false;
-                }
-                
-            } 
-        }
-        //stack.apoint);
-        stack.push(point);
-        return true;
-    }
-
-
 
     getDistance(x1, y1, x2, y2) {
         return Math.abs(y1 - y2) + Math.abs(x1 - x2);
