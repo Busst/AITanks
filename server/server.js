@@ -37,9 +37,9 @@
     
     
     var players = {};
-    players['1'] = new p('1', spawn.p1.x*100 + 50, spawn.p1.y*100 + 50, 5, 'red');
-    players['2'] = new p('2', spawn.p2.x*100 + 50, spawn.p2.y*100 + 50, 5, '#F801CF');
-    players['3'] = new p('3', spawn.p3.x*100 + 50, spawn.p3.y*100 + 50, 5, 'yellow');
+    players['1'] = new p('1', spawn.p1.x*100 + 75, spawn.p1.y*100 + 75, 5, 'red', 50, 50);
+    players['2'] = new p('2', spawn.p2.x*100 + 75, spawn.p2.y*100 + 75, 5, '#F801CF', 50, 50);
+    players['3'] = new p('3', spawn.p3.x*100 + 75, spawn.p3.y*100 + 75, 5, 'yellow', 50, 50);
     
     
     //console.log(map);

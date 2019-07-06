@@ -281,8 +281,8 @@ class MapGen {
         
         
         var tile = map[this.Key(cur.x, cur.y)].tile;
-        //if (tile < 16)
-        //    map[this.Key(cur.x, cur.y)].tile += 16;
+        if (tile < 16)
+            map[this.Key(cur.x, cur.y)].tile += 16;
         if (cur.x === end.x && cur.y === end.y) {
             return true;
         }
