@@ -6,9 +6,10 @@
     var app = express();
     var server = http.Server(app);
     var io = socketIO(server);
-    const map_gen = require('./static/MapGen');
-    const p = require('./static/player');
-    const move_piece = require('./static/Move');
+    //const map_gen = require('./static/MapGen');
+    //const p = require('./static/player');
+    //const move_piece = require('./static/Move');
+    const game_manager = require('./static/GameManager');
     app.set('port', 5000);
     app.use('/static', express.static(__dirname + '/static'));
     // Routing
@@ -24,29 +25,13 @@
     io.on('connection', function(socket) {
     });
 
+    var manager = new game_manager();
+    manager.init(3, 8);
 
-    var gen = new map_gen(8, 8);
-    var move_player = new move_piece(100);
-    var map_obj = gen.generate_map();
-    var map = map_obj.map;
-    var spawn = map_obj.spawn;
-
-    console.log("player 1 spawn: {" + spawn.p1.x + ", " + spawn.p1.y+ "}");
-    console.log("player 2 spawn: {" + spawn.p2.x + ", " + spawn.p2.y + "}");
-    console.log("player 3 spawn: {" + spawn.p3.x + ", " + spawn.p3.y + "}");
-    
-    
-    var players = {};
-    players['1'] = new p('1', spawn.p1.x*100 + 75, spawn.p1.y*100 + 75, 5, 'red', 50, 50);
-    players['2'] = new p('2', spawn.p2.x*100 + 75, spawn.p2.y*100 + 75, 5, '#F801CF', 50, 50);
-    players['3'] = new p('3', spawn.p3.x*100 + 75, spawn.p3.y*100 + 75, 5, 'yellow', 50, 50);
-    
-    
-    //console.log(map);
     setInterval(function() {
-        move_player.update_players(players, map);
         
-        var data = {players: players, map: map };
+        
+        var data = {players: manager.players, map: manager.walls };
         
         io.emit('update', data);
     }, 1000 / 60);

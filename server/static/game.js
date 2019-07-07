@@ -21,7 +21,7 @@
             var player = players[id];
             context.fillStyle = player.color;
             context.beginPath();
-            context.rect(player.x, player.y, 10, 10);
+            context.rect(player.x, player.y, player.width, player.height);
             //context.arc(player.x, player.y, 5, 0, 2 * Math.PI);
             //context.fill();
             context.fill();
@@ -34,20 +34,36 @@
         }
         context.fillStyle = 'black'
         context.lineWidth = 2;
-        var draw_factor = 100;
-        var draw_width = 2;
+        var draw_factor = map.height;
+        var draw_width = map.width;
+
+        for (var id in map.y_walls) {
+            var wall = map.y_walls[id];
+            context.beginPath();
+            context.rect(wall.x, wall.y, draw_factor, draw_width);
+            context.fill();
+            context.stroke();
+        }
         
-        for (var id in map){
+        for (var id in map.x_walls){
+            var wall = map.x_walls[id];
+            context.beginPath();
+            context.rect(wall.x, wall.y, draw_width, draw_factor);
+            context.stroke();
+
+
+
+            /*
             var wall = map[id];
             if (wall === undefined) continue;
             var line_pos = wall.tile;
             context.beginPath();
-            /*
+            
                 1 = left wall
                 2 = top wall
                 4 = right wall
                 8 = bot wall
-            */
+            
             if (line_pos % 2 > 0){
                 context.rect(wall.x * SQUARE_WIDTH, wall.y * SQUARE_HEIGHT, draw_width, draw_factor);
             }
@@ -68,6 +84,7 @@
                 context.fill();
                 context.stroke();
             }
+            */
         }
         
     });

@@ -5,6 +5,8 @@ class Move {
     constructor (frame_depth) {
         this.frame_depth = frame_depth;
         this.last_update = {};
+        this.testx = true;
+        this.testy = true;
     }
 
     make_movement(player) {
@@ -12,7 +14,7 @@ class Move {
 
         var dx = rr.x;
         var dy = rr.y;
-
+        
     
         if (this.last_update[player.id] === undefined) {
             this.last_update[player.id] = {};
@@ -35,8 +37,8 @@ class Move {
         var sumx = 0;
         var sumy = 0;
         for (var frame in this.last_update[player.id]) {
-            sumx += this.last_update[player.id][frame].x -1;
-            sumy += this.last_update[player.id][frame].y -1;
+            sumx += this.last_update[player.id][frame].x;
+            sumy += this.last_update[player.id][frame].y;
         }
 
         sumx = Math.trunc(sumx / this.frame_depth);
@@ -58,28 +60,25 @@ class Move {
 
             var update = this.make_movement(player);
             var collision = this.check_collision(player, map);
-            /*
-            if (collision.left) {
-                if (update.x > 0){
+            
+            if (update.x > 0){
+                if (collision.right){
+                    player.addX(update.x);
+                }
+            } else {
+                if (collision.left){
                     player.addX(update.x);
                 }
             }
-            if (collision.right) {
-                if (update.x < 0){
-                    player.addX(update.x);
+            if (update.y > 0){
+                if (collision.bot){
+                    player.addY(update.y);
                 }
-            }
-            if (collision.top) {
-                if (update.y < 0){
+            } else {
+                if (collision.top){
                     player.addY(update.y);
                 }
             }
-            if (collision.bot) {
-                if (update.y > 0){
-                    player.addY(update.y);
-                }
-            }
-            */
         }
 
     }
@@ -106,26 +105,53 @@ class Move {
         var cells = this.getCells({x: rx, y: ry}, {x: mapx, y: mapy}, player.width, player.height, map);
 
         var l,t,r,b;
+        
 
         l = tile % 2;
         t = (tile >> 1) % 2;
         r = (tile >> 2) % 2;
         b = (tile >> 3) % 2;
 
-        
-        /*
-        if (cells['right'] !== undefined) {
-            var cell_overshot_x = x + player.width - (mapx+1) *100; 
-            if ((cells['right'].tile) % 2)
-                player.addX(-(cell_overshot_x));
-        } 
-        if (cells['bot'] !== undefined) {
-            var cell_overshot_y = y + player.height - (mapy+1) *100;
-            if ((cells['bot'].tile >> 3) % 2)
-                player.addY(-(cell_overshot_y));
+        if (rx < 2 && l) {
+            state.left = false;
         }
-        */
-        
+        if (rx + player.width > 8 && r) {
+            state.right = false;
+        }
+        if (ry < 2 && t) {
+            state.top = false;
+        }
+        if (ry + player.height > 98 && b) {
+            state.bot = false;
+        }
+
+        if (cells['bot'] !== undefined) {
+            var bot_tile = cells['bot'].tile;
+            if ((bot_tile >> 1) % 2) {
+                state.left = false;
+                state.bot = false;
+            }
+            if (((bot_tile >> 2) % 2) && (rx + player.width) > 98) {
+                state.right = false;
+            }
+            if (((bot_tile) % 2) && (rx) < 2) {
+                state.left = false;
+            }
+
+        }
+        if (cells['right'] !== undefined) {
+            if (((bot_tile >> 3) % 2) && (ry + player.height) > 98) {
+                state.bot = false;
+            }
+            if (((bot_tile >> 1) % 2) && ry < 2) {
+                state.top = false;
+            }
+            if ((bot_tile) % 2) {
+                
+                state.right = false;
+            }
+            
+        }
 
         return state;
 
@@ -135,7 +161,7 @@ class Move {
 
     getCells(p_coor, map_coor, p_width, p_height, map) {
         var cells = {};
-        cells['mid'] = (map[''+map_coor.x+map_coor.y]);
+        
         if (p_coor.x + p_width > 100) {
             cells['right'] = (map[''+(map_coor.x+1)+map_coor.y]);
         }    

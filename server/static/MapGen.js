@@ -1,9 +1,11 @@
 'use strict'
 
 class MapGen {
-    constructor (height, width){
+    constructor (height, width, wall_width, wall_length){
         this.height = height;
         this.width = width;
+        this.wall_length = wall_length;
+        this.wall_width = wall_width;
     }
 
     generate_map() {
@@ -18,11 +20,75 @@ class MapGen {
         
 
         this.startPruning(map);
-        this.fixInnerWalls(map);
+        //this.fixInnerWalls(map);
         this.addOuterWalls(map);
+        var walls = this.turnIntoWallObj(map);
         var players = this.setSpawns(map);
-        return {map, spawn: players};
+        return {map, spawn: players, walls};
         
+    }
+    /**
+     * 
+     * @param {} map 
+     * 
+     */
+    turnIntoWallObj(map) {
+        var x_walls = {};
+        var y_walls = {};
+        for (var j = 0; j < this.height; j++) {
+            for (var i = 0; i < this.width; i++) {
+                var cell = map[''+i+j];
+                var tile = cell.tile;
+                if (x_walls[''+ i + j] === undefined) {
+                    if (tile % 2) {
+                        x_walls[''+ i + j] = {
+                            x: i * 100 - this.wall_width / 2,
+                            y: j * 100,
+                            x2: (i + 1) * 100 - this.wall_width / 2,
+                            y2: j * 100
+                        };
+                    }
+                    
+                }
+                if (x_walls[''+ (i+1) + j] === undefined) {
+                    if ((tile >> 2) % 2) {
+                        x_walls[''+ (i+1) + j] = {
+                            x: (i+1) * 100 - this.wall_width / 2,
+                            y: j * 100,
+                            x2: (i + 2) * 100 - this.wall_width / 2,
+                            y2: j * 100
+                        };
+                    }
+                }
+                if (y_walls[''+ i + j] === undefined) {
+                    if ((tile >> 1) % 2) {
+                        y_walls[''+ i + j] = {
+                            x: i * 100,
+                            y: j * 100 - this.wall_width / 2,
+                            x2: i * 100,
+                            y2: (j + 1) * 100 - this.wall_width / 2
+                        };
+                    }
+                    
+                }
+                if (y_walls[''+ i + (j+1)] === undefined) {
+                    if ((tile >> 3) % 2) {
+                        y_walls[''+ i + (j+1)] = {
+                            x: i * 100,
+                            y: (j+1) * 100 - this.wall_width  / 2,
+                            x2: i * 100,
+                            y2: (j + 2) * 100 - this.wall_width / 2
+                        };
+                    }
+                }
+
+            }
+        }
+        
+        var walls = {x_walls, y_walls, height: this.wall_length, width: this.wall_width};
+
+
+        return walls;
     }
     //0 + num goes to left
 
@@ -145,16 +211,13 @@ class MapGen {
     }
 
     prune(lt, rt, lb, rb){
-        var sum =0;
+        var sum = 3;
         
         var left_top_tile = lt.tile;
-        sum += (left_top_tile >> 2) % 2 + (left_top_tile >> 3) % 2;
         var right_top_tile = rt.tile;
-        sum += (right_top_tile >> 3) % 2;
         var left_bot_tile = lb.tile;
         var right_bot_tile = rb.tile;
-        sum += (right_bot_tile) % 2;
-        var inner_sum = sum;
+        
 
         sum += left_top_tile % 2 + (left_top_tile >> 1) % 2;
         sum += (right_top_tile >> 1) % 2 + (right_top_tile >> 2) % 2;
