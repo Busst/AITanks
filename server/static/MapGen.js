@@ -24,7 +24,7 @@ class MapGen {
         this.addOuterWalls(map);
         var walls = this.turnIntoWallObj(map);
         var players = this.setSpawns(map);
-        return {map, spawn: players, walls};
+        return {spawn: players, walls};
         
     }
     /**
@@ -44,8 +44,8 @@ class MapGen {
                         x_walls[''+ i + j] = {
                             x: i * 100 - this.wall_width / 2,
                             y: j * 100,
-                            x2: (i + 1) * 100 - this.wall_width / 2,
-                            y2: j * 100
+                            x2: i * 100 + this.wall_width / 2,
+                            y2: j * 100 + this.wall_length
                         };
                     }
                     
@@ -55,8 +55,8 @@ class MapGen {
                         x_walls[''+ (i+1) + j] = {
                             x: (i+1) * 100 - this.wall_width / 2,
                             y: j * 100,
-                            x2: (i + 2) * 100 - this.wall_width / 2,
-                            y2: j * 100
+                            x2: (i + 1) * 100 + this.wall_width / 2,
+                            y2: j * 100 + this.wall_length
                         };
                     }
                 }
@@ -65,8 +65,8 @@ class MapGen {
                         y_walls[''+ i + j] = {
                             x: i * 100,
                             y: j * 100 - this.wall_width / 2,
-                            x2: i * 100,
-                            y2: (j + 1) * 100 - this.wall_width / 2
+                            x2: i * 100 + this.wall_length,
+                            y2: j * 100 + this.wall_width / 2
                         };
                     }
                     
@@ -76,15 +76,15 @@ class MapGen {
                         y_walls[''+ i + (j+1)] = {
                             x: i * 100,
                             y: (j+1) * 100 - this.wall_width  / 2,
-                            x2: i * 100,
-                            y2: (j + 2) * 100 - this.wall_width / 2
+                            x2: i * 100 + this.wall_length,
+                            y2: j * 100 + this.wall_width / 2
                         };
                     }
                 }
 
             }
         }
-        
+        console.log(x_walls);
         var walls = {x_walls, y_walls, height: this.wall_length, width: this.wall_width};
 
 
