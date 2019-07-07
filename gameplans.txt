@@ -1,0 +1,29 @@
+GameManager
+	-main thread, runs everything
+	-server runs and calls only functions in this
+	~return players array
+	~initiates map gen
+	~initiates spawn gen
+	~runs collision detections
+	~updates players
+
+Collision detection
+	
+
+Server
+	-connects with game on browser
+	-handles data input/output
+
+Player
+	-player sprite in game
+	~returns x/y value for drawing
+	~returns any transformations
+	~has some sort of input/output function
+	~returns color
+	~array of power-ups
+
+MapGen
+
+Game
+
+Move???

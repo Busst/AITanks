@@ -5,6 +5,8 @@ class Move {
     constructor (frame_depth) {
         this.frame_depth = frame_depth;
         this.last_update = {};
+        this.testx = true;
+        this.testy = true;
     }
 
     make_movement(player) {
@@ -12,7 +14,7 @@ class Move {
 
         var dx = rr.x;
         var dy = rr.y;
-
+        
     
         if (this.last_update[player.id] === undefined) {
             this.last_update[player.id] = {};
@@ -59,32 +61,24 @@ class Move {
             var update = this.make_movement(player);
             var collision = this.check_collision(player, map);
             
-            if (collision.left) {
-                if (update.x > 0) {
-                    player.addX(update.x);
-                }
-            } else if (collision.right) {
-                if (update.x < 0) {
+            if (update.x > 0){
+                if (collision.right){
                     player.addX(update.x);
                 }
             } else {
-                player.addX(update.x);
-            }
-            
-            if (collision.top) {
-                if (update.y > 0) {
-                    player.addY(update.y);
+                if (collision.left){
+                    player.addX(update.x);
                 }
-            } else if (collision.bot) {
-                if (update.y < 0) {
+            }
+            if (update.y > 0){
+                if (collision.bot){
                     player.addY(update.y);
                 }
             } else {
-                player.addY(update.y);
+                if (collision.top){
+                    player.addY(update.y);
+                }
             }
-             
-            
-            
         }
 
     }
@@ -96,56 +90,86 @@ class Move {
         var mapx = Math.trunc(x / 100);
         var mapy = Math.trunc(y / 100);
 
+        var rx = x - mapx*100;
+        var ry = y - mapy*100;
+
         var tile = map['' + mapx + mapy].tile;
         
-        return this.relative_pos_in_square(x, y, mapx, mapy, tile);
+        var state =  {
+            top: true,
+            left: true,
+            bot: true,
+            right: true
+        };
+
+        var cells = this.getCells({x: rx, y: ry}, {x: mapx, y: mapy}, player.width, player.height, map);
+
+        var l,t,r,b;
+        
+
+        l = tile % 2;
+        t = (tile >> 1) % 2;
+        r = (tile >> 2) % 2;
+        b = (tile >> 3) % 2;
+
+        if (rx < 2 && l) {
+            state.left = false;
+        }
+        if (rx + player.width > 8 && r) {
+            state.right = false;
+        }
+        if (ry < 2 && t) {
+            state.top = false;
+        }
+        if (ry + player.height > 98 && b) {
+            state.bot = false;
+        }
+
+        if (cells['bot'] !== undefined) {
+            var bot_tile = cells['bot'].tile;
+            if ((bot_tile >> 1) % 2) {
+                state.left = false;
+                state.bot = false;
+            }
+            if (((bot_tile >> 2) % 2) && (rx + player.width) > 98) {
+                state.right = false;
+            }
+            if (((bot_tile) % 2) && (rx) < 2) {
+                state.left = false;
+            }
+
+        }
+        if (cells['right'] !== undefined) {
+            if (((bot_tile >> 3) % 2) && (ry + player.height) > 98) {
+                state.bot = false;
+            }
+            if (((bot_tile >> 1) % 2) && ry < 2) {
+                state.top = false;
+            }
+            if ((bot_tile) % 2) {
+                
+                state.right = false;
+            }
+            
+        }
+
+        return state;
+
         
         
     }
 
-    relative_pos_in_square(px, py, mapx, mapy, tile) {
-        var rpx = px - mapx*100;
-        var rpy = py - mapy*100;
-        var state = {
-            top: false,
-            left: false,
-            bot: false,
-            right: false
-
-        };
-        //left wall
-        if (tile % 2 > 0){
-            if (rpx < 5) {
-                //console.log("left wall touched");
-                state.left = true;
-            }
+    getCells(p_coor, map_coor, p_width, p_height, map) {
+        var cells = {};
+        
+        if (p_coor.x + p_width > 100) {
+            cells['right'] = (map[''+(map_coor.x+1)+map_coor.y]);
+        }    
+        if (p_coor.y + p_height > 100) {
+            cells['bot'] = (map[''+map_coor.x+(map_coor.y+1)]);
         }
-        //top
-        if ((tile >> 1) % 2 > 0) {
-            if (rpy < 5) {
-                //console.log("top wall touched");
-                state.top = true;
-            }
-        } 
-        //right
-        if ((tile >> 2) % 2 > 0) {
-            if (rpx > 90) {
-                //console.log("right wall touched");
-                state.right = true;
-            }
-        } 
-        //bot
-        if ((tile >> 3) % 2 > 0) {
-            if (rpy > 90) {
-                //console.log("bot wall touched");
-                state.bot = true;
-            }
-        } 
-
-        if ((rpx > 91 || rpx < 3 || rpy > 91 || rpy < 3) && (state.left || state.right || state.top || state.bot)){
-            //console.log("in weird spot " + rpx + " " + rpy);
-        }
-        return state;
+        
+        return cells;
         
     }
 

@@ -2,12 +2,15 @@
 
 
 class player {
-    constructor (id, x, y, speed, color) {
+    constructor (id, x, y, speed, color, width, height) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.color = color;
+        this.rotation = 0;
+        this.width = width;
+        this.height = height; 
     }
 
     getID(){

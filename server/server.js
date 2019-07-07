@@ -6,9 +6,10 @@
     var app = express();
     var server = http.Server(app);
     var io = socketIO(server);
-    const map_gen = require('./static/MapGen');
-    const p = require('./static/player');
-    const move_piece = require('./static/Move');
+    //const map_gen = require('./static/MapGen');
+    //const p = require('./static/player');
+    //const move_piece = require('./static/Move');
+    const game_manager = require('./static/GameManager');
     app.set('port', 5000);
     app.use('/static', express.static(__dirname + '/static'));
     // Routing
@@ -24,23 +25,13 @@
     io.on('connection', function(socket) {
     });
 
+    var manager = new game_manager();
+    manager.init(3, 8);
 
-    var gen = new map_gen(8, 8);
-    var move_player = new move_piece(100);
-    var map = gen.generate_map();
-    
-    
-    var players = {};
-    players['1'] = new p('1', 100, 100, 5, 'red');
-    players['2'] = new p('2', 200, 200, 5, '#F801CF');
-    players['3'] = new p('3', 300, 300, 5, 'yellow');
-    
-    
-    //console.log(map);
     setInterval(function() {
-        move_player.update_players(players, map);
         
-        var data = {players: players, map: map };
+        manager.UpdateGame();
+        var data = {players: manager.players, map: manager.walls };
         
         io.emit('update', data);
     }, 1000 / 60);
