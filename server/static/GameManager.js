@@ -35,6 +35,7 @@ class GameManager {
     }
 
     UpdateGame() {
+
         var player = this.players[''+1];
         var q = this.q;
         if (this.DetectCollisions(player)) {
@@ -43,7 +44,27 @@ class GameManager {
 
 
 
+    }
 
+    DetectWallCollision(player, x_speed, y_speed) {
+        const x_walls = this.walls.x_walls;
+        const y_walls = this.walls.y_walls;
+        const x = player.x;
+        const y = player.y;
+        const width = player.width;
+        const height = player.height;
+        for (var id in x_walls) {   //vertical
+            var wall = x_walls[id];
+            var right = x + width;
+            var bot = y + height;
+            if (right >= wall.x && right <= wall.x2 ){
+                
+                return false;
+            }
+            
+        }
+
+        return true;
     }
     DetectCollisions(player) {
         var x_walls = this.walls.x_walls;
@@ -75,6 +96,7 @@ class GameManager {
         
     }
     
+
 
 
 
