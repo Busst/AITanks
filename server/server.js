@@ -30,7 +30,7 @@
 
     setInterval(function() {
         
-        
+        manager.UpdateGame();
         var data = {players: manager.players, map: manager.walls };
         
         io.emit('update', data);

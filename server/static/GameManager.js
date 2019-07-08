@@ -9,6 +9,7 @@ class GameManager {
         this.walls;
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
+        this.q = 0;
 
     }
 
@@ -34,12 +35,45 @@ class GameManager {
     }
 
     UpdateGame() {
+        var player = this.players[''+1];
+        var q = this.q;
+        if (this.DetectCollisions(player)) {
+            
+        } 
 
 
 
 
     }
+    DetectCollisions(player) {
+        var x_walls = this.walls.x_walls;
+        var y_walls = this.walls.y_walls;
+        var x = player.x - 2;
+        var y = player.y - 2;
+        var right = x + player.width + 2;
+        var bot = y + player.height + 2;
+        for (var id in x_walls) {
+            var wall = x_walls[id];
+            if (right > wall.x && right < wall.x2 && y < wall.y2 && bot > wall.y) {
+                return false;
+            }
+            if (x > wall.x && x < wall.x2 && y < wall.y2 && bot > wall.y) {
+                return false;
+            }
+        }
+        for (var id in y_walls) {
+            var wall = y_walls[id];
+            if (bot > wall.y && bot < wall.y2 && x < wall.x2 && right > wall.x) {
+                return false;
+            }
+            if (y > wall.y && y < wall.y2 && x < wall.x2 && right > wall.x) {
+                return false;
+            }
+        }
 
+        return true;
+        
+    }
     
 
 

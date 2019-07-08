@@ -34,9 +34,9 @@
         }
         context.fillStyle = 'black'
         context.lineWidth = 2;
-        var draw_factor = map.height;
-        var draw_width = map.width;
-
+        var draw_factor = 100;
+        var draw_width = 4;
+        
         for (var id in map.y_walls) {
             var wall = map.y_walls[id];
             context.beginPath();
@@ -44,6 +44,7 @@
             context.fill();
             context.stroke();
         }
+        
         
         for (var id in map.x_walls){
             var wall = map.x_walls[id];
