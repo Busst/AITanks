@@ -85,8 +85,6 @@ class MapGen {
             }
         }
         var walls = {x_walls, y_walls, height: this.wall_length, width: this.wall_width};
-        console.log(x_walls);
-
 
         return walls;
     }
