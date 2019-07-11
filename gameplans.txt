@@ -1,4 +1,4 @@
-GameManager
+GameManager (
 	-main thread, runs everything
 	-server runs and calls only functions in this
 	~return players array
@@ -21,9 +21,13 @@ Player
 	~has some sort of input/output function
 	~returns color
 	~array of power-ups
+	0 right
+	90 down
+	180 left
+	270 up
 
 MapGen
-
+	-2d array
 Game
 
 Move???

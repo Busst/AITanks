@@ -11,81 +11,53 @@
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
     var context = canvas.getContext('2d');
+    var a = 0;
     socket.on('update', function(data) {
         var players = data.players;
 
         var map = data.map;
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        
-        for (var id in players) {
-            var player = players[id];
-            context.fillStyle = player.color;
-            context.beginPath();
-            context.rect(player.x, player.y, player.width, player.height);
-            //context.arc(player.x, player.y, 5, 0, 2 * Math.PI);
-            //context.fill();
-            context.fill();
-            context.stroke();
-            //context.fillStyle = 'green';
-            //context.beginPath();
-
-            
-            
-        }
+        //context.rotate(0);
+        context.beginPath();
         context.fillStyle = 'black'
-        context.lineWidth = 2;
+        context.lineWidth = 1;
         var draw_factor = 100;
-        var draw_width = 4;
+        var draw_width = 6;
         
         for (var id in map.y_walls) {
             var wall = map.y_walls[id];
-            context.beginPath();
-            context.rect(wall.x, wall.y, draw_factor, draw_width);
+            context.rect(wall.x, wall.y, wall.x2 - wall.x, wall.y2 - wall.y);
             context.fill();
-            context.stroke();
         }
         
         
         for (var id in map.x_walls){
             var wall = map.x_walls[id];
-            context.beginPath();
-            context.rect(wall.x, wall.y, draw_width, draw_factor);
-            context.stroke();
-
-
-
-            /*
-            var wall = map[id];
-            if (wall === undefined) continue;
-            var line_pos = wall.tile;
-            context.beginPath();
             
-                1 = left wall
-                2 = top wall
-                4 = right wall
-                8 = bot wall
-            
-            if (line_pos % 2 > 0){
-                context.rect(wall.x * SQUARE_WIDTH, wall.y * SQUARE_HEIGHT, draw_width, draw_factor);
-            }
-            if ((line_pos >> 1) % 2 > 0) {
-                context.rect(wall.x * SQUARE_WIDTH, wall.y * SQUARE_HEIGHT, draw_factor, draw_width);
-            } 
-            if ((line_pos >> 2) % 2 > 0) {
-                context.rect(wall.x * SQUARE_WIDTH+draw_factor, wall.y * SQUARE_HEIGHT, draw_width, draw_factor);
-            } 
-            if ((line_pos >> 3) % 2 > 0) {
-                context.rect(wall.x * SQUARE_WIDTH, wall.y * SQUARE_HEIGHT+draw_factor, draw_factor, draw_width);
-            } 
+            context.rect(wall.x, wall.y, wall.x2 - wall.x, wall.y2 - wall.y);
+
+        }
+        context.stroke();
+
+        for (var id in players) {
+            var player = players[id];
+            context.fillStyle = 'green';
+            context.beginPath();
+            context.rect(player.x -player.width / 2, player.y - player.height/2, player.width, player.height);
+            context.fill();
             context.stroke();
-            if ((line_pos >> 4) % 2 > 0) {
-                context.fillStyle = 'green';
-                context.beginPath();
-                context.arc(wall.x * SQUARE_WIDTH + SQUARE_WIDTH / 2, wall.y * SQUARE_HEIGHT + SQUARE_HEIGHT / 2, 5, 0, 2 * Math.PI);
-                context.fill();
-                context.stroke();
-            }
-            */
+            context.save();
+            context.fillStyle = player.color;
+            context.beginPath();
+            context.translate(player.x, player.y);
+            context.rotate(player.a * Math.PI / 180);
+            context.rect(-player.width / 2, - player.height / 2, player.width, player.height);
+            context.fill();
+            context.stroke();
+            context.restore();
+            
+            
+            
         }
         
     });

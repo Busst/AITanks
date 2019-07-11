@@ -20,9 +20,9 @@ class MapGen {
         
 
         this.startPruning(map);
-        //this.fixInnerWalls(map);
         this.addOuterWalls(map);
         var walls = this.turnIntoWallObj(map);
+        this.fixInnerWalls(map);
         var players = this.setSpawns(map);
         return {map, spawn: players, walls};
         
@@ -63,9 +63,9 @@ class MapGen {
                 if (y_walls[''+ i + j] === undefined) {
                     if ((tile >> 1) % 2) {
                         y_walls[''+ i + j] = {
-                            x: i * 100,
+                            x: i * 100 - this.wall_width / 2,
                             y: j * 100 - this.wall_width / 2,
-                            x2: (i + 1) * 100,
+                            x2: (i + 1) * 100 + this.wall_width / 2,
                             y2: j * 100 + this.wall_width / 2
                         };
                     }
@@ -74,9 +74,9 @@ class MapGen {
                 if (y_walls[''+ i + (j+1)] === undefined) {
                     if ((tile >> 3) % 2) {
                         y_walls[''+ i + (j+1)] = {
-                            x: i * 100,
-                            y: (j+1) * 100 - this.wall_width  / 2,
-                            x2: (i + 1) * 100,
+                            x: i * 100- this.wall_width / 2,
+                            y: (j+1) * 100 - this.wall_width / 2,
+                            x2: (i + 1) * 100 + this.wall_width / 2,
                             y2: (j + 1) * 100 + this.wall_width / 2
                         };
                     }
@@ -86,6 +86,7 @@ class MapGen {
         }
         var walls = {x_walls, y_walls, height: this.wall_length, width: this.wall_width};
 
+        
         return walls;
     }
     //0 + num goes to left
@@ -407,28 +408,7 @@ class MapGen {
 
     }
 
-    stacksToString(open, closed) {
-        var str = "";
-        var i = 0;
-        var j = 0;
-        while (i < open.length || j < closed.length){
-            if (i < open.length) {
-                str += open[i].x + " " + open[i].y; 
-                str += "\t";
-                i++;
-            } else {
-                str += "\t";
-            }
-            if (j < closed.length) {
-                str += closed[j].x + " " + closed[j].y; 
-                j++;
-            } 
-            
-            str += "\n";
-        }
-        return str;
-    }
-
+    
 
     compareTo(p, stack) {
         for (var i = 0; i < stack.length; i++){
