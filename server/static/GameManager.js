@@ -34,16 +34,28 @@ class GameManager {
     }
 
     UpdateGame() {
+        var smoothing_angle = 1;
         for (var id in this.players) {
             var player = this.players[id];
-            
+            var smoothing_angle = 1;
             var movement = player.getMove();
             var canmove = this.DetectCollisions(player);
-            console.log(canmove);
-            this.moveUp(player, movement, canmove);
-            this.moveLeft(player, movement, canmove);
 
+            console.log(canmove);
+            console.log(player.a);
             
+            this.moveLeft(player, canmove.left, smoothing_angle);
+            this.moveRight(player, canmove.right, smoothing_angle);
+            this.moveUp(player, canmove.up, smoothing_angle);
+            this.moveDown(player, canmove.down, smoothing_angle);
+
+            if (canmove.up && canmove.down && canmove.left && canmove.right) {
+                player.moveForward(movement.forward);
+                player.moveBack(movement.back);
+                player.rotate(movement.right - movement.left);
+            }
+            
+
             
             
             
@@ -51,12 +63,86 @@ class GameManager {
         
 
     }
-    moveLeft(player, movement, canmove) {
-        
+    
+    moveRight(player, canmove, smoothing_angle) {
+        var angle = player.a;
+        if (!canmove && angle > 5 && angle < 85) {
+            player.rotate(smoothing_angle);
+            player.x -= Math.cos(smoothing_angle);
+        }
+        if (!canmove && angle < 355 && angle > 275) {
+            player.rotate(-smoothing_angle);
+            player.x -= Math.cos(smoothing_angle);
+        }
+
+        if (!canmove && angle <= 5 && angle >= 355) {
+            var r_angle = Math.random()*3 - 1;
+            r_angle *= 3;
+            player.rotate(r_angle);
+            player.x -= Math.cos(r_angle);
+        }
+
     }
 
 
-    moveUp(player, movement, canmove) {
+    moveLeft(player, canmove, smoothing_angle) {
+        var angle = player.a;
+        if (!canmove && angle > 93 && angle < 177) {
+            player.rotate(-smoothing_angle);
+            player.x += Math.cos(smoothing_angle);
+        }
+        if (!canmove && angle < 267 && angle > 183) {
+            player.rotate(smoothing_angle);
+            player.x += Math.cos(smoothing_angle);
+        }
+
+        if (!canmove && angle <= 185 && angle >= 175) {
+            var r_angle = Math.random()*3 - 1;
+            r_angle *= 3;
+            player.rotate(r_angle);
+            player.x += Math.cos(r_angle);
+        }
+    }
+
+    moveUp(player, canmove, smoothing_angle) {
+        var angle = player.a;
+        if (!canmove && angle > 185 && angle < 265) {
+            player.rotate(-smoothing_angle);
+            player.y += Math.sin(smoothing_angle);
+        }
+        if (!canmove && angle < 355 && angle > 275) {
+            player.rotate(smoothing_angle);
+            player.y += Math.sin(smoothing_angle);
+        }
+    
+        if (!canmove && angle <= 185 && angle >= 175) {
+            var r_angle = Math.random()*3 - 1;
+            r_angle *= 3;
+            player.rotate(r_angle);
+            player.y += Math.sin(r_angle);
+        }
+        
+    }
+
+    
+
+    moveDown(player, canmove, smoothing_angle) { 
+        var angle = player.a;
+        if (!canmove && angle > 5 && angle < 85) {
+            player.rotate(-smoothing_angle);
+            player.y -= Math.sin(smoothing_angle);
+        }
+        if (!canmove && angle < 175 && angle > 95) {
+            player.rotate(smoothing_angle);
+            player.y -= Math.sin(smoothing_angle);
+        }
+    
+        if (!canmove && angle <= 95 && angle >= 85) {
+            var r_angle = Math.random()*3 - 1;
+            r_angle *= 3;
+            player.rotate(r_angle);
+            player.y -= Math.sin(r_angle);
+        }
         
     }
 

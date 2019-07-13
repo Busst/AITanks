@@ -8,7 +8,7 @@ class player {
         this.y = y;
         this.speed = speed;
         this.color = color;
-        this.a = 185;
+        this.a = 96;
         this.width = width;
         this.height = height; 
         this.time = 0;
@@ -51,21 +51,12 @@ class player {
 
     getMove() {
         var move = {};
-        move.forward = .5;
-        move.back = .5;
+        move.forward = .75;
+        move.back = 0;
         move.right = 0;
         move.left = 0;
         
-
-        if (this.time > 50) {
-            //move.right = Math.trunc(Math.random() * 2);
-            //move.left = -Math.trunc(Math.random() * 6);
-        } else {
-            //move.right = Math.trunc(Math.random() * 6);
-            //move.left = -Math.trunc(Math.random() * 2);
-        }
-        this.time++;
-        this.time = this.time % 100;
+        
         return move;
     }
 }

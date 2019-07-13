@@ -34,5 +34,5 @@
         var data = {players: manager.players, map: manager.walls };
         
         io.emit('update', data);
-    }, 1000 / 60);
+    }, 1000 / 120);
     
