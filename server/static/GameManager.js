@@ -27,32 +27,29 @@ class GameManager {
         console.log("player 2 spawn: {" + this.spawn.p2.x + ", " + this.spawn.p2.y + "}");
         console.log("player 3 spawn: {" + this.spawn.p3.x + ", " + this.spawn.p3.y + "}");
 
-        for (var i = 1; i <= player_num -2; i++) {
+        for (var i = 1; i <= player_num ; i++) {
             this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
         }
         return true;
     }
 
     UpdateGame() {
-        var smoothing_angle = 1;
+        
         for (var id in this.players) {
             var player = this.players[id];
-            var smoothing_angle = 1;
             var movement = player.getMove();
             var canmove = this.DetectCollisions(player);
 
-            console.log(canmove);
-            console.log(player.a);
-            
-            this.moveLeft(player, canmove.left, smoothing_angle);
-            this.moveRight(player, canmove.right, smoothing_angle);
-            this.moveUp(player, canmove.up, smoothing_angle);
-            this.moveDown(player, canmove.down, smoothing_angle);
-
+            //1 = up down
+            //2 = left right
+            if ((!canmove.up || !canmove.down) && (canmove.right && canmove.left)) {
+                player.moveForward(movement.forward, 2);
+            }
+            if ((!canmove.left || !canmove.right) && (canmove.up && canmove.down)) {
+                player.moveForward(movement.forward, 1);
+            }
             if (canmove.up && canmove.down && canmove.left && canmove.right) {
-                player.moveForward(movement.forward);
-                player.moveBack(movement.back);
-                player.rotate(movement.right - movement.left);
+                player.moveForward(movement.forward, 0);
             }
             
 
@@ -153,7 +150,7 @@ class GameManager {
             left: true,
             right: true
         };
-        var margin = 2;
+        var margin = 1;
 
         var x_walls = this.walls.x_walls;
         var y_walls = this.walls.y_walls;
