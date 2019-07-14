@@ -44,10 +44,10 @@ class GameManager {
             console.log(canmove);
             console.log(player.a);
             
-            this.moveLeft(player, canmove.left, smoothing_angle);
-            this.moveRight(player, canmove.right, smoothing_angle);
-            this.moveUp(player, canmove.up, smoothing_angle);
-            this.moveDown(player, canmove.down, smoothing_angle);
+            //this.moveLeft(player, canmove.left, smoothing_angle);
+            //this.moveRight(player, canmove.right, smoothing_angle);
+            //this.moveUp(player, canmove.up, smoothing_angle);
+            //this.moveDown(player, canmove.down, smoothing_angle);
 
             if (canmove.up && canmove.down && canmove.left && canmove.right) {
                 player.moveForward(movement.forward);
@@ -213,22 +213,36 @@ class GameManager {
         for (var id in x_walls) {
             var wall = x_walls[id];
             if (x_min < wall.x2 && x_max > wall.x && y_min < wall.y2 && y_max > wall.y) {
-                if (x_min < wall.x) {
-                    
-                    move.right = false;
+                
+                if (y_max < wall.y) {
+                    move.down = false;
+                } else if (y_min < wall.y2 - 1) {
+                    move.up = false;
                 } else {
-                    move.left = false;
+                    if (x_min < wall.x) {
+                        move.right = false;
+                    } else {
+                        move.left = false;
+                    }
                 }
+                
             }
             
         }
         for (var id in y_walls) {
             var wall = y_walls[id];
             if (x_min < wall.x2 && x_max > wall.x && y_min < wall.y2 && y_max > wall.y) {
-                if (y_min < wall.y) {
-                    move.down = false;
+                
+                if (x_max < wall.x) {
+                    move.right = false;
+                } else if (x_min > wall.x2){
+                    move.left = false;
                 } else {
-                    move.up = false;
+                    if (y_min < wall.y) {
+                        move.down = false;
+                    } else {
+                        move.up = false;
+                    }
                 }
                 
             }
