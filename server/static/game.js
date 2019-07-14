@@ -41,11 +41,6 @@
 
         for (var id in players) {
             var player = players[id];
-            context.fillStyle = 'green';
-            context.beginPath();
-            context.rect(player.x -player.width / 2, player.y - player.height/2, player.width, player.height);
-            context.fill();
-            context.stroke();
             context.save();
             context.fillStyle = player.color;
             context.beginPath();
