@@ -27,32 +27,68 @@ class GameManager {
         console.log("player 2 spawn: {" + this.spawn.p2.x + ", " + this.spawn.p2.y + "}");
         console.log("player 3 spawn: {" + this.spawn.p3.x + ", " + this.spawn.p3.y + "}");
 
-        for (var i = 1; i <= player_num ; i++) {
+        for (var i = 1; i <= player_num - 2; i++) {
             this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
         }
         return true;
     }
 
-    UpdateGame() {
+    UpdateGame(input) {
+        if (input === undefined) {
+            input = {
+                forward: false,
+                back: false,
+                right: false,
+                left: false
+            };
+        }
         
         for (var id in this.players) {
             var player = this.players[id];
-            var movement = player.getMove();
-            var canmove = this.DetectCollisions(player);
-
+            
+            var movement = player.getMove(input);
+            var angle = player.a;
+            player.moveForward(movement.forward, 0);
+            player.moveBack(movement.back, 0);
+            console.log(player.y);
+            player.rotate(movement.right - movement.left);
+            console.log(player.y);
             //1 = up down
             //2 = left right
-            if ((!canmove.up || !canmove.down) && (canmove.right && canmove.left)) {
-                player.moveForward(movement.forward, 2);
+            var canmove = this.DetectCollisions(player);
+            if (!canmove.up && angle > 180) {
+                player.moveBack(movement.forward, 1);
+                player.y += .25;
             }
-            if ((!canmove.left || !canmove.right) && (canmove.up && canmove.down)) {
-                player.moveForward(movement.forward, 1);
+            if (!canmove.up && angle < 180) {
+                player.moveForward(movement.back, 1);
+                player.y += .25;
             }
-            if (canmove.up && canmove.down && canmove.left && canmove.right) {
-                player.moveForward(movement.forward, 0);
+            if (!canmove.down && angle > 180) {
+                player.moveForward(movement.back, 1);
+                player.y -= .25;
+            }
+            if (!canmove.down && angle < 180) {
+                player.moveBack(movement.forward, 1);
+                player.y -= .25;
             }
             
-
+            if (!canmove.right && (angle > 270 || angle < 90)) {
+                player.moveBack(movement.forward, 2);
+                player.x -= .25;
+            }
+            if (!canmove.right && angle < 270 && angle > 90) {
+                player.moveForward(movement.back, 2);
+                player.x -= .25;
+            }
+            if (!canmove.left && (angle < 90 || angle > 270)) {
+                player.moveForward(movement.back, 2);
+                player.x += .25;
+            }
+            if (!canmove.left && angle > 90 && angle < 270) {
+                player.moveBack(movement.forward, 2);
+                player.x += .25;
+            }
             
             
             
@@ -61,87 +97,6 @@ class GameManager {
 
     }
     
-    moveRight(player, canmove, smoothing_angle) {
-        var angle = player.a;
-        if (!canmove && angle > 5 && angle < 85) {
-            player.rotate(smoothing_angle);
-            player.x -= Math.cos(smoothing_angle);
-        }
-        if (!canmove && angle < 355 && angle > 275) {
-            player.rotate(-smoothing_angle);
-            player.x -= Math.cos(smoothing_angle);
-        }
-
-        if (!canmove && angle <= 5 && angle >= 355) {
-            var r_angle = Math.random()*3 - 1;
-            r_angle *= 3;
-            player.rotate(r_angle);
-            player.x -= Math.cos(r_angle);
-        }
-
-    }
-
-
-    moveLeft(player, canmove, smoothing_angle) {
-        var angle = player.a;
-        if (!canmove && angle > 93 && angle < 177) {
-            player.rotate(-smoothing_angle);
-            player.x += Math.cos(smoothing_angle);
-        }
-        if (!canmove && angle < 267 && angle > 183) {
-            player.rotate(smoothing_angle);
-            player.x += Math.cos(smoothing_angle);
-        }
-
-        if (!canmove && angle <= 185 && angle >= 175) {
-            var r_angle = Math.random()*3 - 1;
-            r_angle *= 3;
-            player.rotate(r_angle);
-            player.x += Math.cos(r_angle);
-        }
-    }
-
-    moveUp(player, canmove, smoothing_angle) {
-        var angle = player.a;
-        if (!canmove && angle > 185 && angle < 265) {
-            player.rotate(-smoothing_angle);
-            player.y += Math.sin(smoothing_angle);
-        }
-        if (!canmove && angle < 355 && angle > 275) {
-            player.rotate(smoothing_angle);
-            player.y += Math.sin(smoothing_angle);
-        }
-    
-        if (!canmove && angle <= 185 && angle >= 175) {
-            var r_angle = Math.random()*3 - 1;
-            r_angle *= 3;
-            player.rotate(r_angle);
-            player.y += Math.sin(r_angle);
-        }
-        
-    }
-
-    
-
-    moveDown(player, canmove, smoothing_angle) { 
-        var angle = player.a;
-        if (!canmove && angle > 5 && angle < 85) {
-            player.rotate(-smoothing_angle);
-            player.y -= Math.sin(smoothing_angle);
-        }
-        if (!canmove && angle < 175 && angle > 95) {
-            player.rotate(smoothing_angle);
-            player.y -= Math.sin(smoothing_angle);
-        }
-    
-        if (!canmove && angle <= 95 && angle >= 85) {
-            var r_angle = Math.random()*3 - 1;
-            r_angle *= 3;
-            player.rotate(r_angle);
-            player.y -= Math.sin(r_angle);
-        }
-        
-    }
 
     DetectCollisions(player) {
         var move = {
@@ -210,8 +165,7 @@ class GameManager {
         for (var id in x_walls) {
             var wall = x_walls[id];
             if (x_min < wall.x2 && x_max > wall.x && y_min < wall.y2 && y_max > wall.y) {
-                if (x_min < wall.x) {
-                    
+                if (x_min < wall.x) { 
                     move.right = false;
                 } else {
                     move.left = false;

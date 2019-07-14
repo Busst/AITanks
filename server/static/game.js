@@ -6,23 +6,68 @@
 
     var socket = io();
 
-  
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);    
+
+    var e = {
+        forward: false,
+        back: false,
+        right: false,
+        left: false
+    };
+    function keyDownHandler(event) {
+        var keyPressed = String.fromCharCode(event.keyCode);
+        console.log("moving " + keyPressed);
+        
+        if (keyPressed === "&") {
+            e.forward = true;
+        }
+        if (keyPressed === "(") {
+            e.back = true;
+        }
+        if (keyPressed === "%") {
+            e.left = true;            
+        }
+        if (keyPressed === "'") {
+            e.right = true;
+        }
+
+        socket.emit('input', e);
+    }
+    function keyUpHandler(event) {
+        var keyPressed = String.fromCharCode(event.keyCode);
+        console.log("moving " + keyPressed);
+        
+        if (keyPressed === "&") {
+            e.forward = false;
+        }
+        if (keyPressed === "(") {
+            e.back = false;
+        }
+        if (keyPressed === "%") {
+            e.left = false;            
+        }
+        if (keyPressed === "'") {
+            e.right = false;
+        }
+
+        socket.emit('input', e);
+    }
     var canvas = document.getElementById('canvas');
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
     var context = canvas.getContext('2d');
-    var a = 0;
+    
     socket.on('update', function(data) {
         var players = data.players;
 
         var map = data.map;
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        //context.rotate(0);
+        
         context.beginPath();
         context.fillStyle = 'black'
         context.lineWidth = 1;
-        var draw_factor = 100;
-        var draw_width = 6;
+        
         
         for (var id in map.y_walls) {
             var wall = map.y_walls[id];
