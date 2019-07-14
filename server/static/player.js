@@ -8,7 +8,7 @@ class player {
         this.y = y;
         this.speed = speed;
         this.color = color;
-        this.a = 96;
+        this.a = 170;
         this.width = width;
         this.height = height; 
         this.time = 0;
@@ -33,14 +33,21 @@ class player {
         this.y += y;
     }
 
-    moveForward(speed) {
-        this.x += Math.cos(this.a * Math.PI / 180) * speed;
-        this.y += Math.sin(this.a * Math.PI / 180) * speed;
+    moveForward(speed, direction) {
+        if (direction != 1){
+            this.x += Math.cos(this.a * Math.PI / 180) * speed;
+        }
+        if (direction != 2) {
+            this.y += Math.sin(this.a * Math.PI / 180) * speed;
+        }
     }
-    moveBack(speed) {
-        this.x -= Math.cos(this.a * Math.PI / 180) * speed;
-        this.y -= Math.sin(this.a * Math.PI / 180) * speed;
-        
+    moveBack(speed, direction) {
+        if (direction != 1){
+            this.x += Math.cos(this.a * Math.PI / 180) * speed * -1;
+        }
+        if (direction != 2) {
+            this.y += Math.sin(this.a * Math.PI / 180) * speed * -1;
+        }
     }
     rotate(rotation) {
         this.a += rotation;
@@ -49,12 +56,24 @@ class player {
             this.a = 360 - this.a;
     }
 
-    getMove() {
+    getMove(input) {
         var move = {};
-        move.forward = .75;
+        move.forward = 0;
         move.back = 0;
         move.right = 0;
         move.left = 0;
+        if (input.forward) {
+            move.forward = 1;
+        }
+        if (input.back) {
+            move.back = 1;
+        }
+        if (input.left) {
+            move.left = 3;
+        }
+        if (input.right) {
+            move.right = 3;
+        }
         
         
         return move;
