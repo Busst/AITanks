@@ -27,9 +27,8 @@
     });
 
     var manager = new game_manager();
-    if (!manager.init(3, 8)) {
-        return 0;
-    }
+    manager.init(3, 8);
+    
 
 
     setInterval(function() {

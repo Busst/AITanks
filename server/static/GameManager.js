@@ -31,45 +31,7 @@ class GameManager {
             this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
         }
 
-        var test1 = [];
-        var test2 = [];
-        test1[0] = {x: 0, y: 0};
-        test1[1] = {x: 0, y: 10};
-        test1[2] = {x: 10, y: 0};
-        test1[3] = {x: 10, y: 10};
-        test2[0] = {x: 5, y: 5};
-        test2[1] = {x: 5, y: 15};
-        test2[2] = {x: 15, y: 5};
-        test2[3] = {x: 15, y: 15};
-        var axes1 = this.getAxes(test1);
-        console.log(axes1);
-        var axes2 = this.getAxes(test2);
-        console.log(axes2);
-        var overlap = true;
-        for (var j = 0; j < axes1.length; j++) {
-            var axis = axes1[j];
-            var p1 = this.project(axis, test1);
-            var p2 = this.project(axis, test2);
-            console.log(p1.max + " " + p1.min);
-            console.log(p2.max + " " + p2.min);
-            console.log();
-            if (p1.max > p2.min && p1.max < p2.max || p1.min > p2.min && p1.min < p2.max) {
-                overlap = false;
-            }
-        }console.log();console.log();
-        for (var j = 0; j < axes2.length; j++) {
-            var axis = axes2[j];
-            var p1 = this.project(axis, test1);
-            var p2 = this.project(axis, test2);
-            console.log(p1.max + " " + p1.min);
-            console.log(p2.max + " " + p2.min);
-            console.log();
-            if (p1.max > p2.min && p1.max < p2.max || p1.min > p2.min && p1.min < p2.max) {
-                overlap = false;
-            }
-        }
-        console.log(overlap);
-        return false;
+        
     }
 
     UpdateGame(input) {
@@ -90,45 +52,45 @@ class GameManager {
             player.moveForward(movement.forward, 0);
             player.moveBack(movement.back, 0);
             player.rotate(movement.right - movement.left);
+
+            var collision = this.DetectCollisions(player);
+
+            if (collision.down) {
+                if (angle > 180) {
+                    player.moveBack(movement.forward, 1);
+                } else {
+                    player.moveForward(movement.back, 1);
+                }
+                player.y += .15;
+            }
+            if (collision.up) {
+                if (angle < 180) {
+                    player.moveBack(movement.forward, 1);
+                } else {
+                    player.moveForward(movement.back, 1);
+                }
+                player.y -= .15;
+            }
+            if (collision.left) {
+                if (angle < 90 || angle > 270) {
+                    player.moveBack(movement.forward, 2);
+                } else {
+                    player.moveForward(movement.back, 2);
+                }
+                player.x -= .15;
+            }
+            if (collision.right) {
+                if (angle > 90 && angle < 270) {
+                    player.moveBack(movement.forward, 2);
+                } else {
+                    player.moveForward(movement.back, 2);
+                }
+                player.x += .15;
+            }
+
             
             //1 = up down
             //2 = left right
-            var canmove = this.DetectCollisions(player);
-            if (!canmove.up && angle > 180) {
-                player.moveBack(movement.forward, 1);
-                player.y += .25;
-            }
-            if (!canmove.up && angle < 180) {
-                player.moveForward(movement.back, 1);
-                player.y += .25;
-            }
-            if (!canmove.down && angle > 180) {
-                player.moveForward(movement.back, 1);
-                player.y -= .25;
-            }
-            if (!canmove.down && angle < 180) {
-                player.moveBack(movement.forward, 1);
-                player.y -= .25;
-            }
-            
-            if (!canmove.right && (angle > 270 || angle < 90)) {
-                player.moveBack(movement.forward, 2);
-                player.x -= .25;
-            }
-            if (!canmove.right && angle < 270 && angle > 90) {
-                player.moveForward(movement.back, 2);
-                player.x -= .25;
-            }
-            if (!canmove.left && (angle < 90 || angle > 270)) {
-                player.moveForward(movement.back, 2);
-                player.x += .25;
-            }
-            if (!canmove.left && angle > 90 && angle < 270) {
-                player.moveBack(movement.forward, 2);
-                player.x += .25;
-            }
-            
-            
             
         }
         
@@ -145,9 +107,13 @@ class GameManager {
                 y: p1.y - p2.y
             };
             if (edge.x === 0) {
-                edge.y = -edge.y
+                var temp = edge.x;
+                edge.x = -edge.y;
+                edge.y = temp;
             } else {
-                edge.x = -edge.x;
+                var temp = edge.y;
+                edge.y = -edge.x;
+                edge.x = temp;
             }
             var sqrt = Math.sqrt(Math.pow(edge.x, 2) + Math.pow(edge.y, 2));
             edge.x = edge.x / sqrt;
@@ -175,17 +141,38 @@ class GameManager {
         var dot = p1.x * p2.x + p1.y * p2.y;
         return dot;
     }
+    test(axes1, axes2, test1, test2) {
+        var p1, p2;
+        
+        for (var j = 0; j < axes1.length; j++) {
+            var axis = axes1[j];
+            p1 = this.project(axis, test1);
+            p2 = this.project(axis, test2);
+            
+            if (p1.max < p2.min && p1.max < p2.max || p1.min >= p2.max && p1.min > p2.max) {
+                return false;   
+            }
+        }
+        
+        
+        for (var j = 0; j < axes2.length; j++) {
+            var axis = axes2[j];
+            p1 = this.project(axis, test1);
+            p2 = this.project(axis, test2);
+            
+            if (p1.max < p2.min && p1.max < p2.max || p1.min >= p2.max && p1.min > p2.max) {
+                return false;
+                
+            }
+        }
+        
+        return true;
+    }
 
 
 
 
     DetectCollisions(player) {
-        var move = {
-            up: true,
-            down: true,
-            left: true,
-            right: true
-        };
         var margin = 1;
 
         var x_walls = this.walls.x_walls;
@@ -217,12 +204,19 @@ class GameManager {
         var vertices2 = [];
         vertices1[0] = top_left;
         vertices1[1] = top_right;
-        vertices1[2] = bot_left;
-        vertices1[3] = bot_right;
+        vertices1[2] = bot_right;
+        vertices1[3] = bot_left;
         var axes1 = this.getAxes(vertices1);
         
         var axes2;
-
+        var overlap1 = false;
+        var overlap2 = false;
+        var collision = {
+            left: false,
+            right: false,
+            up: false,
+            down: false
+        };
         for (var id in x_walls) {
             var wall = x_walls[id];
             vertices2[0] = {
@@ -234,142 +228,74 @@ class GameManager {
                 y: wall.y
             };
             vertices2[2] = {
-                x: wall.x,
-                y: wall.y2
-            };
-            vertices2[3] = {
                 x: wall.x2,
                 y: wall.y2
             };
+            vertices2[3] = {
+                x: wall.x,
+                y: wall.y2
+            };
             axes2 = this.getAxes(vertices2);
-            var overlap = true;
-            /*
-            for (var j = 0; j < axes1.length; j++) {
-                var axis = axes1[j];
-                var p1 = this.project(axis, vertices1);
-                var p2 = this.project(axis, vertices2);
-                if (p1.max > p2.min && p1.max < p2.max || p1.min > p2.min && p1.min < p2.max) {
-                    overlap = false;
+            if (!overlap1) {
+                overlap1 = this.test(axes1, axes2, vertices1, vertices2);
+                if (overlap1 && vertices1[0].x > vertices2[0].x && vertices1[2].x > vertices2[0].x) {
+                    collision['right'] = true;
                 }
-            }
-            for (var j = 0; j < axes2.length; j++) {
-                var axis = axes2[j];
-                var p1 = this.project(axis, vertices1);
-                var p2 = this.project(axis, vertices2);
-                if (p1.max > p2.min && p1.max < p2.max || p1.min > p2.min && p1.min < p2.max) {
-                    overlap = false;
+                if (overlap1 && vertices1[0].x < vertices2[1].x && vertices1[2].x < vertices2[1].x) {
+                    collision['left'] = true;
                 }
-            }
-            if (overlap) {
-                console.log("overlapping " + id);
-            }
-            */
-
-
-
-            
-            
-        }
-
-
-
-        //end of fixes
-
-
-        /*
-        var xx = {
-            top_left: x - Math.cos(a * Math.PI / 180) * (player.width / 2 + margin) + Math.sin(a * Math.PI / 180) * (player.height / 2 + margin),
-            top_right: x + Math.cos(a * Math.PI / 180) * (player.width / 2 + margin) + Math.sin(a * Math.PI / 180) * (player.height / 2 + margin),
-            bot_left: x - Math.cos(a * Math.PI / 180) * (player.width / 2 + margin) - Math.sin(a * Math.PI / 180) * (player.height / 2 + margin),
-            bot_right: x + Math.cos(a * Math.PI / 180) * (player.width / 2 + margin) - Math.sin(a * Math.PI / 180) * (player.height / 2 + margin)
-        };
-        var yy = {
-            top_right: y - Math.cos(a * Math.PI / 180) * (player.height / 2 + margin) + Math.sin(a * Math.PI / 180) * (player.width / 2 + margin),
-            top_left: y - Math.cos(a * Math.PI / 180) * (player.height / 2 + margin) - Math.sin(a * Math.PI / 180) * (player.width / 2 + margin),
-            bot_right: y + Math.cos(a * Math.PI / 180) * (player.height / 2 + margin) + Math.sin(a * Math.PI / 180) * (player.width / 2 + margin),
-            bot_left: y + Math.cos(a * Math.PI / 180) * (player.height / 2 + margin) - Math.sin(a * Math.PI / 180) * (player.width / 2 + margin)
-        };
-
-
-
-
-        var x_min;
-        var y_min;
-        var x_max;
-        var y_max;
-
-        
-        for (var id in xx) {
-            var point = xx[id];
-            if (x_min === undefined) {
-                x_min = point;
-            }
-            if (x_max === undefined) {
-                x_max = point;
-            }
-            if (point > x_max) {
-                x_max = point;
-            }
-            if (point < x_min) {
-                x_min = point;
-            }
-        }
-        for (var id in yy) {
-            var point = yy[id];
-            if (y_min === undefined) {
-                y_min = point;
-            }
-            if (y_max === undefined) {
-                y_max = point;
-            }
-            if (point > y_max) {
-                y_max = point;
-            }
-            if (point < y_min) {
-                y_min = point;
-            }
-        }
-
-        for (var id in x_walls) {
-            var wall = x_walls[id];
-            if (x_min < wall.x2 && x_max > wall.x && y_min < wall.y2 && y_max > wall.y) {
-                if (x_min < wall.x) { 
-                    move.right = false;
-                } else {
-                    if (x_min < wall.x) {
-                        move.right = false;
-                    } else {
-                        move.left = false;
-                    }
+                if (overlap1 && vertices1[0].y > vertices2[0].y && vertices1[2].y > vertices2[0].y) {
+                    collision['down'] = true;
                 }
+                if (overlap1 && vertices1[0].y < vertices2[2].y && vertices1[2].y < vertices2[2].y) {
+                    collision['up'] = true;
+                } 
                 
+
+
             }
-
-
-
             
         }
         for (var id in y_walls) {
             var wall = y_walls[id];
-            if (x_min < wall.x2 && x_max > wall.x && y_min < wall.y2 && y_max > wall.y) {
-                
-                if (x_max < wall.x) {
-                    move.right = false;
-                } else if (x_min > wall.x2){
-                    move.left = false;
-                } else {
-                    if (y_min < wall.y) {
-                        move.down = false;
-                    } else {
-                        move.up = false;
-                    }
+            vertices2[0] = {
+                x: wall.x,
+                y: wall.y
+            };
+            vertices2[1] = {
+                x: wall.x2,
+                y: wall.y
+            };
+            vertices2[2] = {
+                x: wall.x2,
+                y: wall.y2
+            };
+            vertices2[3] = {
+                x: wall.x,
+                y: wall.y2
+            };
+            axes2 = this.getAxes(vertices2);
+            
+            if (!overlap2) {
+                overlap2 = this.test(axes1, axes2, vertices1, vertices2);
+                if (overlap2 && vertices1[0].y > vertices2[0].y && vertices1[2].y > vertices2[0].y) {
+                    collision['down'] = true;
+                }
+                if (overlap2 && vertices1[0].y < vertices2[2].y && vertices1[2].y < vertices2[2].y) {
+                    collision['up'] = true;
+                } 
+                if (overlap2 && vertices1[0].x > vertices2[0].x && vertices1[2].x > vertices2[0].x) {
+                    collision['right'] = true;
+                }
+                if (overlap2 && vertices1[0].x < vertices2[1].x && vertices1[2].x < vertices2[1].x) {
+                    collision['left'] = true;
                 }
                 
             }
             
         }
-        */
-        return move;
+        
+        return collision;
 
     }
     

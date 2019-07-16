@@ -63,10 +63,10 @@ class player {
         move.right = 0;
         move.left = 0;
         if (input.forward) {
-            move.forward = 1;
+            move.forward = 2;
         }
         if (input.back) {
-            move.back = 1;
+            move.back = 2;
         }
         if (input.left) {
             move.left = 3;
