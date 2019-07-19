@@ -5,10 +5,12 @@ class GameManager {
     constructor () {
         
         this.players = {};
+        this.bullets = [];
         this.map;
         this.walls;
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
+        this.bullet_gen = require('./bullet');
         this.q = 0;
 
     }
@@ -18,6 +20,7 @@ class GameManager {
      * 
      */
     init(player_num, grid_size) {
+        this.grid_size = grid_size;
         var gen = new this.map_gen(grid_size, grid_size, 4, 100);
         var map_obj = gen.generate_map();
         this.spawn = map_obj.spawn;
@@ -34,58 +37,82 @@ class GameManager {
         
     }
 
+
+
     UpdateGame(input) {
         if (input === undefined) {
             input = {
                 forward: false,
                 back: false,
                 right: false,
-                left: false
+                left: false,
+                fire: false
             };
         }
         
+        this.playerCollisions(input);
+
+        this.bulletCollisions();
+        
+        
+
+    }
+
+    playerCollisions(input) {
         for (var id in this.players) {
             var player = this.players[id];
             
             var movement = player.getMove(input);
+            var firing = player.fire(input.fire);
             var angle = player.a;
-            player.moveForward(movement.forward, 0);
-            player.moveBack(movement.back, 0);
-            player.rotate(movement.right - movement.left);
+            player.update(movement.forward, movement.back, movement.left, movement.right);
+            var player_vert = this.getPlayerVertices(player);
+            var collision = this.DetectCollisions(player_vert);
 
-            var collision = this.DetectCollisions(player);
+            var wall1 = collision.wall1;
+            var wall2 = collision.wall2;
 
-            if (collision.down) {
-                if (angle > 180) {
-                    player.moveBack(movement.forward, 1);
-                } else {
-                    player.moveForward(movement.back, 1);
+            if (collision.overlap) {
+                var sin = Math.abs(Math.sin(player.a * Math.PI / 180)) * (player.height/ 2);
+                var cos = Math.abs(Math.cos(player.a * Math.PI / 180)) * (player.width / 2);
+                var top = player.y - cos - sin;
+                var bot = player.y + cos + sin;
+                var left = player.x- cos - sin;
+                var right= player.x+ cos + sin;
+                var move = 2;
+                if (wall1 !== undefined) {
+                    if (left > wall1.x2 && (top < wall1.y2 && bot > wall1.y)) {
+                        player.x += move;
+                    } else if (right < wall1.x && (top < wall1.y2 && bot > wall1.y)) {
+                        player.x -= move;
+                    } else if (player.y > wall1.y && player.y > wall1.y2 ) {
+                        player.y += move;
+                    } else if (player.y < wall1.y && player.y < wall1.y2) {
+                        player.y -= move;
+                    }
                 }
-                player.y += .15;
+                if (wall2 !== undefined) {
+                    
+                    if (bot < wall2.y2 && (left < wall2.x2 && right > wall2.x)) {
+                        player.y -= move;
+                    } else if (top > wall2.y && (left < wall2.x2 && right > wall2.x)) {
+                        player.y += move;
+                    } else if (right > wall2.x2 && bot > wall2.y2 && top < wall2.y) {
+                        player.x += move;
+                    } else if (left < wall2.x && bot > wall2.y2 && top < wall2.y) {
+                        player.x -= move;
+                    }
+                }
             }
-            if (collision.up) {
-                if (angle < 180) {
-                    player.moveBack(movement.forward, 1);
-                } else {
-                    player.moveForward(movement.back, 1);
-                }
-                player.y -= .15;
-            }
-            if (collision.left) {
-                if (angle < 90 || angle > 270) {
-                    player.moveBack(movement.forward, 2);
-                } else {
-                    player.moveForward(movement.back, 2);
-                }
-                player.x -= .15;
-            }
-            if (collision.right) {
-                if (angle > 90 && angle < 270) {
-                    player.moveBack(movement.forward, 2);
-                } else {
-                    player.moveForward(movement.back, 2);
-                }
-                player.x += .15;
+            
+            if (firing !== undefined) {
+                console.log('shooting ' + firing);
+                this.bullets[this.bullets.length] = new this.bullet_gen('default', id,
+                    player.x + Math.cos(angle * Math.PI / 180) * 10, 
+                    player.y + Math.sin(angle * Math.PI / 180) * 10, 
+                    angle, 1, 10,
+                    2);
+                    
             }
 
             
@@ -93,10 +120,55 @@ class GameManager {
             //2 = left right
             
         }
-        
-
     }
     
+    bulletCollisions() {
+        for (var id in this.bullets) {
+            var bullet = this.bullets[id];
+            
+            if (bullet.lifeDecay()) {
+                this.bullets.splice(id, 1);
+                this.players[bullet.id].addDefaultBullet();
+            }
+            bullet.update();
+            var bullet_v = this.getBulletVertices(bullet);
+            var collision = this.DetectCollisions(bullet_v, "bullet");
+            var wall1 = collision.wall1;
+            var wall2 = collision.wall2;
+            
+            if (collision.overlap) {
+                var sin = Math.abs(Math.sin(bullet.a * Math.PI / 180)) * (bullet.radius / 2);
+                var cos = Math.abs(Math.cos(bullet.a * Math.PI / 180)) * (bullet.radius / 2);
+                var top = bullet.y - cos - sin;
+                var bot = bullet.y + cos + sin;
+                var left = bullet.x- cos - sin;
+                var right= bullet.x+ cos + sin;
+                var move = 1;
+                
+                if (wall1 !== undefined) {
+                    if ((left > wall1.x2 && (top < wall1.y2 && bot > wall1.y)) || (right < wall1.x && (top < wall1.y2 && bot > wall1.y))) {
+                        bullet.a = (540 - bullet.a) % 360;
+                    } else if ((player.y > wall1.y && player.y > wall1.y2) || (player.y < wall1.y && player.y < wall1.y2)) {
+                        bullet.a = (360 - bullet.a) % 360;
+                    }
+                }
+                if (wall2 !== undefined) {
+                    
+                    if ((bot < wall2.y2 && (left < wall2.x2 && right > wall2.x)) || (top > wall2.y && (left < wall2.x2 && right > wall2.x))) {
+                        bullet.a = (360 - bullet.a) % 360;
+                    } else if ((right > wall2.x2 && bot > wall2.y2 && top < wall2.y) || (left < wall2.x && bot > wall2.y2 && top < wall2.y)) {
+                        bullet.a = (540 - bullet.a) % 360;
+                    } 
+                    
+                }
+            }
+
+            
+            
+            
+        }
+    }
+
     getAxes(vertices) {
         var axes = [];
         for (var i = 0; i < vertices.length; i++){
@@ -169,17 +241,12 @@ class GameManager {
         return true;
     }
 
-
-
-
-    DetectCollisions(player) {
+    getPlayerVertices(player) {
         var margin = 1;
-
-        var x_walls = this.walls.x_walls;
-        var y_walls = this.walls.y_walls;
         var x = player.x;
         var y = player.y;
         var a = player.a;
+        var vertices1 = [];
 
         //adding fixes to sat
 
@@ -199,103 +266,111 @@ class GameManager {
             x: x + Math.cos(a * Math.PI / 180) * (player.width / 2 + margin) - Math.sin(a * Math.PI / 180) * (player.height / 2 + margin),
             y: y + Math.cos(a * Math.PI / 180) * (player.height / 2 + margin) + Math.sin(a * Math.PI / 180) * (player.width / 2 + margin)
         };
-
-        var vertices1 = [];
-        var vertices2 = [];
+        
         vertices1[0] = top_left;
         vertices1[1] = top_right;
         vertices1[2] = bot_right;
         vertices1[3] = bot_left;
+        return vertices1;
+
+    }
+
+    getBulletVertices(bullet) {
+        var vertices1 = [];
+        var top = {
+            x: bullet.x - bullet.radius,
+            y: bullet.y - bullet.radius
+        }
+        var bot = {
+            x: bullet.x + bullet.radius,
+            y: bullet.y - bullet.radius
+        }
+        var right = {
+            x: bullet.x + bullet.radius,
+            y: bullet.y + bullet.radius
+        }
+        var left = {
+            x: bullet.x - bullet.radius,
+            y: bullet.y + bullet.radius
+        }
+        
+        vertices1[0] = top;
+        vertices1[1] = bot;
+        vertices1[2] = right;
+        vertices1[3] = left;
+        return vertices1;
+    }
+
+    testWalls(walls, axes1 ,vertices1) {
+        var overlap = false;
+        var vertices2 = [];
+        var walls_skimmed = [];
+
+        var x = Math.trunc(vertices1[0].x / 100);
+        var y = Math.trunc(vertices1[0].y / 100);
+        
+        for (var i = -1; i < 2; i++) {
+            for (var j = -1; j < 2; j++) {
+                if (x+i >= 0 && x+i < this.grid_size && y+j >= 0 && y+j < this.grid_size ) {
+                    walls_skimmed.push(""+(x+i) + (y + j));        
+                }
+            }
+        }
+        var wall_hit;
+        for (var id in walls_skimmed) {
+            var wall = walls[walls_skimmed[id]];
+            if (wall === undefined) {continue;}
+            vertices2[0] = {
+                x: wall.x,
+                y: wall.y
+            };
+            vertices2[1] = {
+                x: wall.x2,
+                y: wall.y
+            };
+            vertices2[2] = {
+                x: wall.x2,
+                y: wall.y2
+            };
+            vertices2[3] = {
+                x: wall.x,
+                y: wall.y2
+            };
+            var axes2 = this.getAxes(vertices2);
+            if (!overlap) {
+                overlap = this.test(axes1, axes2, vertices1, vertices2);
+                 
+                if (overlap) {
+                    wall_hit = wall;
+                    break;   
+                }
+                
+            }
+            
+        }
+        return {overlap, wall_hit};
+
+    }
+
+    DetectCollisions(vertices1, type) {
+        
+        var x_walls = this.walls.x_walls;
+        var y_walls = this.walls.y_walls;
+
         var axes1 = this.getAxes(vertices1);
         
-        var axes2;
         var overlap1 = false;
         var overlap2 = false;
-        var collision = {
-            left: false,
-            right: false,
-            up: false,
-            down: false
-        };
-        for (var id in x_walls) {
-            var wall = x_walls[id];
-            vertices2[0] = {
-                x: wall.x,
-                y: wall.y
-            };
-            vertices2[1] = {
-                x: wall.x2,
-                y: wall.y
-            };
-            vertices2[2] = {
-                x: wall.x2,
-                y: wall.y2
-            };
-            vertices2[3] = {
-                x: wall.x,
-                y: wall.y2
-            };
-            axes2 = this.getAxes(vertices2);
-            if (!overlap1) {
-                overlap1 = this.test(axes1, axes2, vertices1, vertices2);
-                if (overlap1 && vertices1[0].x > vertices2[0].x && vertices1[2].x > vertices2[0].x) {
-                    collision['right'] = true;
-                }
-                if (overlap1 && vertices1[0].x < vertices2[1].x && vertices1[2].x < vertices2[1].x) {
-                    collision['left'] = true;
-                }
-                if (overlap1 && vertices1[0].y > vertices2[0].y && vertices1[2].y > vertices2[0].y) {
-                    collision['down'] = true;
-                }
-                if (overlap1 && vertices1[0].y < vertices2[2].y && vertices1[2].y < vertices2[2].y) {
-                    collision['up'] = true;
-                } 
-                
 
-
-            }
-            
-        }
-        for (var id in y_walls) {
-            var wall = y_walls[id];
-            vertices2[0] = {
-                x: wall.x,
-                y: wall.y
-            };
-            vertices2[1] = {
-                x: wall.x2,
-                y: wall.y
-            };
-            vertices2[2] = {
-                x: wall.x2,
-                y: wall.y2
-            };
-            vertices2[3] = {
-                x: wall.x,
-                y: wall.y2
-            };
-            axes2 = this.getAxes(vertices2);
-            
-            if (!overlap2) {
-                overlap2 = this.test(axes1, axes2, vertices1, vertices2);
-                if (overlap2 && vertices1[0].y > vertices2[0].y && vertices1[2].y > vertices2[0].y) {
-                    collision['down'] = true;
-                }
-                if (overlap2 && vertices1[0].y < vertices2[2].y && vertices1[2].y < vertices2[2].y) {
-                    collision['up'] = true;
-                } 
-                if (overlap2 && vertices1[0].x > vertices2[0].x && vertices1[2].x > vertices2[0].x) {
-                    collision['right'] = true;
-                }
-                if (overlap2 && vertices1[0].x < vertices2[1].x && vertices1[2].x < vertices2[1].x) {
-                    collision['left'] = true;
-                }
-                
-            }
-            
-        }
+        overlap1 = this.testWalls(x_walls, axes1, vertices1);
+        overlap2 = this.testWalls(y_walls, axes1, vertices1);
         
-        return collision;
+
+        var overlap = overlap1.overlap || overlap2.overlap;
+        var wall1 = overlap1.wall_hit;
+        var wall2 = overlap2.wall_hit;
+        
+        return {overlap, wall1, wall2};
 
     }
     

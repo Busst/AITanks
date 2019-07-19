@@ -34,9 +34,9 @@
     setInterval(function() {
         
         manager.UpdateGame(input);
-        var data = {players: manager.players, map: manager.walls };
+        var data = {players: manager.players, map: manager.walls, bullets: manager.bullets};
         
         io.emit('update', data);
         
-    }, 1000 / 120);
+    }, 1000 / 150);
     

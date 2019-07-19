@@ -42,9 +42,9 @@ class MapGen {
                 if (x_walls[''+ i + j] === undefined) {
                     if (tile % 2) {
                         x_walls[''+ i + j] = {
-                            x: i * 100 - this.wall_width / 2,
+                            x: i * 100 + this.wall_width / 4,
                             y: j * 100,
-                            x2: i * 100 + this.wall_width / 2,
+                            x2: i * 100 - this.wall_width / 4,
                             y2: (j + 1) * 100
                         };
                     }
@@ -53,9 +53,9 @@ class MapGen {
                 if (x_walls[''+ (i+1) + j] === undefined) {
                     if ((tile >> 2) % 2) {
                         x_walls[''+ (i+1) + j] = {
-                            x: (i+1) * 100 - this.wall_width / 2,
+                            x: (i+1) * 100 + this.wall_width / 4,
                             y: j * 100,
-                            x2: (i + 1) * 100 + this.wall_width / 2,
+                            x2: (i + 1) * 100 - this.wall_width / 4,
                             y2: (j + 1) * 100
                         };
                     }

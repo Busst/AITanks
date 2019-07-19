@@ -31,6 +31,9 @@
         if (keyPressed === "'") {
             e.right = true;
         }
+        if (keyPressed === " ") {
+            e.fire = true;
+        }
 
         socket.emit('input', e);
     }
@@ -50,6 +53,9 @@
         if (keyPressed === "'") {
             e.right = false;
         }
+        if (keyPressed === " ") {
+            e.fire = false;
+        }
 
         socket.emit('input', e);
     }
@@ -60,6 +66,7 @@
     
     socket.on('update', function(data) {
         var players = data.players;
+        var bullets = data.bullets;
 
         var map = data.map;
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -83,6 +90,33 @@
 
         }
         context.stroke();
+
+        for (var id in bullets) {
+             var bullet = bullets[id];
+            // context.fillStyle = 'green';
+            // context.beginPath();
+            // context.arc(bullet.x-bullet.radius, bullet.y-bullet.radius, bullet.radius, 0, 2 * Math.PI);
+            // context.fill();
+            // context.stroke();
+            // context.beginPath();
+            // context.arc(bullet.x-bullet.radius, bullet.y+bullet.radius, bullet.radius, 0, 2 * Math.PI);
+            // context.fill();
+            // context.stroke();
+            // context.beginPath();
+            // context.arc(bullet.x+bullet.radius, bullet.y-bullet.radius, bullet.radius, 0, 2 * Math.PI);
+            // context.fill();
+            // context.stroke();
+            // context.beginPath();
+            // context.arc(bullet.x+bullet.radius, bullet.y+bullet.radius, bullet.radius, 0, 2 * Math.PI);
+            // context.fill();
+            // context.stroke();
+            context.fillStyle = 'black';
+            context.beginPath();
+            context.arc(bullet.x, bullet.y, bullet.radius, 0, 2 * Math.PI);
+            context.fill();
+            context.stroke();
+
+        }
 
         for (var id in players) {
             var player = players[id];
