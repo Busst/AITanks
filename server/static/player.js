@@ -8,10 +8,14 @@ class player {
         this.y = y;
         this.speed = speed;
         this.color = color;
-        this.a = 170;
+        this.a = 0;
         this.width = width;
         this.height = height; 
         this.time = 0;
+        this.bullets = {};
+        this.bullets['default'] = 1;
+        
+        
     }
 
     getID(){
@@ -33,6 +37,29 @@ class player {
         this.y += y;
     }
 
+    fire(input) {
+        if (!input) {
+            return;
+        }
+        if (this.bullets.default > 0) {
+            this.bullets.default--;
+            return 'default';
+        }
+        return;
+
+
+    }
+
+    update(forward, back, left, right) {
+        this.moveForward(forward, 0);
+        this.moveBack(back, 0);
+        this.rotate(right - left);
+    }
+
+    addDefaultBullet(){
+        this.bullets.default++;
+    }
+
     moveForward(speed, direction) {
         if (direction != 1){
             this.x += Math.cos(this.a * Math.PI / 180) * speed;
@@ -52,7 +79,7 @@ class player {
     rotate(rotation) {
         this.a += rotation;
         this.a = this.a % 360;
-        if (this.a < 0)
+        if (this.a <= 0)
             this.a = 360 - this.a;
     }
 
@@ -63,10 +90,10 @@ class player {
         move.right = 0;
         move.left = 0;
         if (input.forward) {
-            move.forward = 2;
+            move.forward = 1.5;
         }
         if (input.back) {
-            move.back = 2;
+            move.back = 1.5;
         }
         if (input.left) {
             move.left = 3;
