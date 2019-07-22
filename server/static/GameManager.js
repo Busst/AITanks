@@ -30,9 +30,12 @@ class GameManager {
         console.log("player 2 spawn: {" + this.spawn.p2.x + ", " + this.spawn.p2.y + "}");
         console.log("player 3 spawn: {" + this.spawn.p3.x + ", " + this.spawn.p3.y + "}");
 
-        for (var i = 1; i <= player_num - 2; i++) {
-            this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
+        for (var i = 1; i <= player_num - 1; i++) {
+            //this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
         }
+        this.players[''+1] = new this.player_gen(''+1, this.spawn['p'+1].x*100 + 20, this.spawn['p'+1].y*100+50, 7, 'red', 30, 20);
+        this.players[''+2] = new this.player_gen(''+2, this.spawn['p'+2].x*100 + 20, this.spawn['p'+2].y*100+50, 7, 'green', 30, 20);
+        //this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
 
         
     }
@@ -46,8 +49,12 @@ class GameManager {
                 back: false,
                 right: false,
                 left: false,
-                fire: false
+                fire: false,
+                reset: false
             };
+        }
+        if (input.reset !== undefined && input.reset) {
+            this.init(2, 8);
         }
         
         this.playerCollisions(input);
@@ -80,8 +87,24 @@ class GameManager {
 
     }
 
-    detectPlayerCollision() {
-        
+    detectPlayerCollision(id, player_vert) {
+        var axes1 = this.getAxes(player_vert);
+        var hit = {
+            collision: false,
+            players: [] };
+        for (var p_id in this.players) {
+            if (p_id === id) {continue;};
+            var player = this.players[p_id];
+            var ver2 = this.getPlayerVertices(player);
+            var axes2 = this.getAxes(ver2);
+            var test = this.test(axes1, axes2, player_vert, ver2);
+            hit.collision = test || hit.collision;
+            if (test) {
+                hit.players.push(p_id);
+            }
+        }
+        return hit;
+
     }
 
     playerCollisions(input) {
@@ -94,10 +117,38 @@ class GameManager {
             player.update(movement.forward, movement.back, movement.left, movement.right);
             var player_vert = this.getPlayerVertices(player);
             var collision = this.DetectWallCollisions(player_vert);
-            var player_collision = this.detectPlayerCollision();
+            var player_collision = this.detectPlayerCollision(id, player_vert);
 
             var wall1 = collision.wall1;
             var wall2 = collision.wall2;
+
+            if (player_collision.collision) {
+                var sin = Math.abs(Math.sin(player.a * Math.PI / 180)) * (player.height/ 2);
+                var cos = Math.abs(Math.cos(player.a * Math.PI / 180)) * (player.width / 2);
+                var top = player.y - cos - sin;
+                var bot = player.y + cos + sin;
+                var left = player.x- cos - sin;
+                var right= player.x+ cos + sin;
+                var move = 2;
+                //console.log(id + " " + left + " " + top + " "+right+" "+bot);
+                
+                
+                for (var p_id in player_collision.players) {
+                    var player2 = this.players[player_collision.players[p_id]];
+                    var sin2 = Math.abs(Math.sin(player2.a * Math.PI / 180)) * (player2.height/ 2);
+                    var cos2 = Math.abs(Math.cos(player2.a * Math.PI / 180)) * (player2.width / 2);
+                    var top2 = player2.y - cos - sin;
+                    var bot2 = player2.y + cos + sin;
+                    var left2 = player2.x- cos - sin;
+                    var right2= player2.x+ cos + sin;
+                    //console.log("\t" + player_collision.players[p_id] + " " + left2 + " " + top2 + " "+right2+" "+bot2);
+                    
+                    player.update(-movement.forward, -movement.back, 0, 0);
+                    
+
+                }
+
+            }
 
             if (collision.overlap) {
                 var sin = Math.abs(Math.sin(player.a * Math.PI / 180)) * (player.height/ 2);
@@ -145,7 +196,7 @@ class GameManager {
             
             //1 = up down
             //2 = left right
-            
+            break;
         }
     }
     

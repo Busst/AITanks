@@ -13,7 +13,9 @@
         forward: false,
         back: false,
         right: false,
-        left: false
+        left: false,
+        reset: false
+        
     };
     function keyDownHandler(event) {
         var keyPressed = String.fromCharCode(event.keyCode);
@@ -34,7 +36,9 @@
         if (keyPressed === " ") {
             e.fire = true;
         }
-
+        if (keyPressed === "Q") {
+            e.reset = true;
+        }
         socket.emit('input', e);
     }
     function keyUpHandler(event) {
@@ -56,6 +60,10 @@
         if (keyPressed === " ") {
             e.fire = false;
         }
+        if (keyPressed === "Q") {
+            e.reset = false;
+        }
+        
 
         socket.emit('input', e);
     }
