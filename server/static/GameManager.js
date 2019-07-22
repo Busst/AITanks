@@ -72,12 +72,16 @@ class GameManager {
 
                 var hit = this.test(player_axes, bullet_axes, player_vert, bullet_v) && bullet.testable;
                 if (hit) {
-                    console.log("player " + p_id + ": has been slain");
+                    delete this.players[p_id];
                 }
 
             }
         }
 
+    }
+
+    detectPlayerCollision() {
+        
     }
 
     playerCollisions(input) {
@@ -90,6 +94,7 @@ class GameManager {
             player.update(movement.forward, movement.back, movement.left, movement.right);
             var player_vert = this.getPlayerVertices(player);
             var collision = this.DetectWallCollisions(player_vert);
+            var player_collision = this.detectPlayerCollision();
 
             var wall1 = collision.wall1;
             var wall2 = collision.wall2;
@@ -150,7 +155,9 @@ class GameManager {
             
             if (bullet.lifeDecay()) {
                 this.bullets.splice(id, 1);
-                this.players[bullet.id].addDefaultBullet();
+                if (this.players[bullet.id] !== undefined) {
+                    this.players[bullet.id].addDefaultBullet();
+                }
             }
             bullet.update();
             var bullet_v = this.getBulletVertices(bullet);
