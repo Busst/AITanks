@@ -53,9 +53,35 @@ class GameManager {
         this.playerCollisions(input);
 
         this.bulletCollisions();
+        this.playerBulletCollisions();
+        
         
         
 
+    }
+
+    playerBulletCollisions() {
+        for (var p_id in this.players) {
+            var player = this.players[p_id];
+            var player_vert = this.getPlayerVertices(player); //change to player
+            var player_axes = this.getAxes(player_vert);
+            for (var b_id in this.bullets) {
+                var bullet = this.bullets[b_id];
+                var bullet_v = this.getBulletVertices(bullet); //change to bullet class
+                var bullet_axes = this.getAxes(bullet_v);
+
+                var hit = this.test(player_axes, bullet_axes, player_vert, bullet_v) && bullet.testable;
+                if (hit) {
+                    delete this.players[p_id];
+                }
+
+            }
+        }
+
+    }
+
+    detectPlayerCollision() {
+        
     }
 
     playerCollisions(input) {
@@ -67,7 +93,8 @@ class GameManager {
             var angle = player.a;
             player.update(movement.forward, movement.back, movement.left, movement.right);
             var player_vert = this.getPlayerVertices(player);
-            var collision = this.DetectCollisions(player_vert);
+            var collision = this.DetectWallCollisions(player_vert);
+            var player_collision = this.detectPlayerCollision();
 
             var wall1 = collision.wall1;
             var wall2 = collision.wall2;
@@ -110,7 +137,7 @@ class GameManager {
                 this.bullets[this.bullets.length] = new this.bullet_gen('default', id,
                     player.x + Math.cos(angle * Math.PI / 180) * 10, 
                     player.y + Math.sin(angle * Math.PI / 180) * 10, 
-                    angle, 1, 10,
+                    angle, 3, 4,
                     2);
                     
             }
@@ -128,11 +155,13 @@ class GameManager {
             
             if (bullet.lifeDecay()) {
                 this.bullets.splice(id, 1);
-                this.players[bullet.id].addDefaultBullet();
+                if (this.players[bullet.id] !== undefined) {
+                    this.players[bullet.id].addDefaultBullet();
+                }
             }
             bullet.update();
             var bullet_v = this.getBulletVertices(bullet);
-            var collision = this.DetectCollisions(bullet_v, "bullet");
+            var collision = this.DetectWallCollisions(bullet_v, "bullet");
             var wall1 = collision.wall1;
             var wall2 = collision.wall2;
             
@@ -143,7 +172,6 @@ class GameManager {
                 var bot = bullet.y + cos + sin;
                 var left = bullet.x- cos - sin;
                 var right= bullet.x+ cos + sin;
-                var move = 1;
                 
                 if (wall1 !== undefined) {
                     if ((left > wall1.x2 && (top < wall1.y2 && bot > wall1.y)) || (right < wall1.x && (top < wall1.y2 && bot > wall1.y))) {
@@ -311,7 +339,7 @@ class GameManager {
         
         for (var i = -1; i < 2; i++) {
             for (var j = -1; j < 2; j++) {
-                if (x+i >= 0 && x+i < this.grid_size && y+j >= 0 && y+j < this.grid_size ) {
+                if (x+i >= 0 && x+i <= this.grid_size && y+j >= 0 && y+j <= this.grid_size ) {
                     walls_skimmed.push(""+(x+i) + (y + j));        
                 }
             }
@@ -352,7 +380,7 @@ class GameManager {
 
     }
 
-    DetectCollisions(vertices1, type) {
+    DetectWallCollisions(vertices1, type) {
         
         var x_walls = this.walls.x_walls;
         var y_walls = this.walls.y_walls;
