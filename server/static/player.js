@@ -14,6 +14,7 @@ class player {
         this.time = 0;
         this.bullets = {};
         this.bullets['default'] = 1;
+        this.alive = true;
         
         
     }

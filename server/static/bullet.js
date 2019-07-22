@@ -10,12 +10,19 @@ class bullet {
         this.speed = speed;
         this.radius = radius;
         this.life = life * 100;
-        this.id = id
+        this.max_life = this.life;
+        this.id = id;
+        this.collidable = false;
+        this.testable = false;
     }
 
     lifeDecay() {
+        
         if (--this.life === 0) {
             return true;
+        }
+        if (this.life === this.max_life - 10) {
+            this.testable = true;
         }
         return false;
     }
