@@ -26,17 +26,17 @@
         });
     });
 
-    var manager = new game_manager();
-    manager.init(3, 8);
+    var manager = new game_manager(8);
+    manager.init(3);
     
 
 
     setInterval(function() {
         
         manager.UpdateGame(input);
-        var data = {players: manager.players, map: manager.walls, bullets: manager.bullets};
+        var data = {players: manager.players, map: manager.walls, bullets: manager.bullets, powers: manager.powerUps};
         
         io.emit('update', data);
         
-    }, 1000 / 150);
+    }, 1000 / 90);
     

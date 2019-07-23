@@ -12,9 +12,9 @@ class player {
         this.width = width;
         this.height = height; 
         this.time = 0;
-        this.bullets = {};
-        this.bullets['default'] = 1;
+        this.curBullet = 'default';
         this.alive = true;
+        this.lastMove = {};
         
         
     }
@@ -39,26 +39,49 @@ class player {
     }
 
     fire(input) {
-        if (!input) {
+        
+        if (!input || this.curBullet.length === 0) {
             return;
         }
-        if (this.bullets.default > 0) {
-            this.bullets.default--;
-            return 'default';
-        }
-        return;
+        var temp = this.curBullet;
+        this.curBullet = '';
+        return temp;
 
 
+    }
+
+    undo() {
+        this.moveForward(-this.lastMove.forward, 0);
+        this.moveBack(-this.lastMove.back, 0);
+        this.rotate(this.lastMove.left - this.lastMove.right);
     }
 
     update(forward, back, left, right) {
+        
         this.moveForward(forward, 0);
         this.moveBack(back, 0);
         this.rotate(right - left);
+        this.lastMove = {
+            forward,
+            back,
+            left,
+            right
+        };
+
     }
 
     addDefaultBullet(){
-        this.bullets.default++;
+        if (this.curBullet.length === 0 ) {
+            this.curBullet = 'default';
+        }
+    }
+
+    addPower(power) {
+        if (this.curBullet === 'default' || this.curBullet.length === 0) {
+            this.curBullet = power;
+            return true;
+        }
+        return false;
     }
 
     moveForward(speed, direction) {

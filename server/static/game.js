@@ -14,12 +14,13 @@
         back: false,
         right: false,
         left: false,
-        reset: false
+        reset: false,
+        addPower: false
         
     };
     function keyDownHandler(event) {
         var keyPressed = String.fromCharCode(event.keyCode);
-        console.log("moving " + keyPressed);
+        
         
         if (keyPressed === "&") {
             e.forward = true;
@@ -39,11 +40,14 @@
         if (keyPressed === "Q") {
             e.reset = true;
         }
+        if (keyPressed === "P") {
+            e.addPower = true;
+        }
         socket.emit('input', e);
     }
     function keyUpHandler(event) {
         var keyPressed = String.fromCharCode(event.keyCode);
-        console.log("moving " + keyPressed);
+        
         
         if (keyPressed === "&") {
             e.forward = false;
@@ -63,6 +67,9 @@
         if (keyPressed === "Q") {
             e.reset = false;
         }
+        if (keyPressed === "P") {
+            e.addPower = false;
+        }
         
 
         socket.emit('input', e);
@@ -75,8 +82,8 @@
     socket.on('update', function(data) {
         var players = data.players;
         var bullets = data.bullets;
-
         var map = data.map;
+        var powers = data.powers;
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         
         context.beginPath();
@@ -100,30 +107,14 @@
         context.stroke();
 
         for (var id in bullets) {
-             var bullet = bullets[id];
-            // context.fillStyle = 'green';
-            // context.beginPath();
-            // context.arc(bullet.x-bullet.radius, bullet.y-bullet.radius, bullet.radius, 0, 2 * Math.PI);
-            // context.fill();
-            // context.stroke();
-            // context.beginPath();
-            // context.arc(bullet.x-bullet.radius, bullet.y+bullet.radius, bullet.radius, 0, 2 * Math.PI);
-            // context.fill();
-            // context.stroke();
-            // context.beginPath();
-            // context.arc(bullet.x+bullet.radius, bullet.y-bullet.radius, bullet.radius, 0, 2 * Math.PI);
-            // context.fill();
-            // context.stroke();
-            // context.beginPath();
-            // context.arc(bullet.x+bullet.radius, bullet.y+bullet.radius, bullet.radius, 0, 2 * Math.PI);
-            // context.fill();
-            // context.stroke();
+            var bullet = bullets[id];
+           
             context.fillStyle = 'black';
             context.beginPath();
             context.arc(bullet.x, bullet.y, bullet.radius, 0, 2 * Math.PI);
             context.fill();
             context.stroke();
-
+            
         }
 
         for (var id in players) {
@@ -139,7 +130,15 @@
             context.restore();
             
             
-            
+        }
+
+        for (var id in powers) {
+            var p = powers[id];
+            context.fillStyle = 'purple';
+            context.beginPath();
+            context.rect(p.x - 5, p.y - 5, 10, 10);
+            context.fill();
+            context.stroke();
         }
         
     });

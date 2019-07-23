@@ -18,16 +18,17 @@ class bullet {
 
     lifeDecay() {
         
-        if (--this.life === 0) {
+        if (--this.life <= 0) {
             return true;
         }
-        if (this.life === this.max_life - 10) {
+        if (this.life === this.max_life - (4 - this.speed) * 10) {
             this.testable = true;
         }
         return false;
     }
 
     update() {
+        
         this.x += Math.cos(this.a * Math.PI / 180) * this.speed;
         this.y += Math.sin(this.a * Math.PI / 180) * this.speed;
     }
