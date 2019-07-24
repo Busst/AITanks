@@ -14,22 +14,7 @@ class CollisionManager {
         this.playerPowerCollision(players, powerUps);
         return p_hit;
     }
-
-    detectPlayerCollision(id, player_vert, players) {
-        var axes1 = this.getAxes(player_vert);
     
-        for (var p_id in players) {
-            if (p_id === id) {continue;}
-            var player = players[p_id];
-            var ver2 = this.getPlayerVertices(player);
-            var axes2 = this.getAxes(ver2);
-            if (this.test(axes1, axes2, player_vert, ver2)) {
-                return true;
-            }
-        }
-        return false;
-
-    }
 
     playerCollisions(players, walls) {
         for (var id in players) {
@@ -37,14 +22,9 @@ class CollisionManager {
             
             var player_vert = this.getPlayerVertices(player);
             var collision = this.DetectWallCollisions(player_vert, walls, 'player');
-            var player_collision = this.detectPlayerCollision(id, player_vert, players);
             
             var wall1 = collision.wall1;
             var wall2 = collision.wall2;
-
-            if (player_collision) {
-                player.undo();
-            } 
 
             if (collision.overlap) {
                 var sin = Math.abs(Math.sin(player.a * Math.PI / 180)) * (player.height/ 2);
@@ -90,48 +70,46 @@ class CollisionManager {
     
     bulletCollisions(bullets, walls, players) {
         for (var id in bullets) {
-            var bullet = bullets[id];
-            if (bullet.lifeDecay()) {
-                bullets.splice(id, 1);
-                if (players[bullet.id] !== undefined) {
-                    players[bullet.id].addDefaultBullet();
-                }
-            }
-            bullet.update();
-            var bullet_v = this.getBulletVertices(bullet);
-            var collision = this.DetectWallCollisions(bullet_v, walls, "bullet");
-            var wall1 = collision.wall1;
-            var wall2 = collision.wall2;
+            var ba = bullets[id].getBulletArray();
             
-            if (collision.overlap) {
-                var sin = Math.abs(Math.sin(bullet.a * Math.PI / 180)) * (bullet.radius / 2);
-                var cos = Math.abs(Math.cos(bullet.a * Math.PI / 180)) * (bullet.radius / 2);
-                var top = bullet.y - cos - sin;
-                var bot = bullet.y + cos + sin;
-                var left = bullet.x- cos - sin;
-                var right= bullet.x+ cos + sin;
+            for (var b_id in ba) {
+                var bullet = ba[b_id];
+
+                var bullet_v = this.getBulletVertices(bullet);
+                var collision = this.DetectWallCollisions(bullet_v, walls, "bullet");
+                var wall1 = collision.wall1;
+                var wall2 = collision.wall2;
                 
-                if (wall1 !== undefined) {
-                    if ((left > wall1.x2 && (top < wall1.y2 && bot > wall1.y)) || (right < wall1.x && (top < wall1.y2 && bot > wall1.y))) {
-                        bullet.a = (540 - bullet.a) % 360;
-                    } else if ((bullet.y > wall1.y && bullet.y > wall1.y2) || (bullet.y < wall1.y && bullet.y < wall1.y2)) {
-                        bullet.a = (360 - bullet.a) % 360;
+                if (collision.overlap) {
+                    var sin = Math.abs(Math.sin(bullet.a * Math.PI / 180)) * (bullet.radius / 2);
+                    var cos = Math.abs(Math.cos(bullet.a * Math.PI / 180)) * (bullet.radius / 2);
+                    var top = bullet.y - cos - sin;
+                    var bot = bullet.y + cos + sin;
+                    var left = bullet.x- cos - sin;
+                    var right= bullet.x+ cos + sin;
+                    
+                    if (wall1 !== undefined) {
+                        if ((left > wall1.x2 && (top < wall1.y2 && bot > wall1.y)) || (right < wall1.x && (top < wall1.y2 && bot > wall1.y))) {
+                            bullet.a = (540 - bullet.a) % 360;
+                        } else if ((bullet.y > wall1.y && bullet.y > wall1.y2) || (bullet.y < wall1.y && bullet.y < wall1.y2)) {
+                            bullet.a = (360 - bullet.a) % 360;
+                        }
+                    }
+                    if (wall2 !== undefined) {
+                        
+                        if ((bot < wall2.y2 && (left < wall2.x2 && right > wall2.x)) || (top > wall2.y && (left < wall2.x2 && right > wall2.x))) {
+                            bullet.a = (360 - bullet.a) % 360;
+                        } else if ((right > wall2.x2 && bot > wall2.y2 && top < wall2.y) || (left < wall2.x && bot > wall2.y2 && top < wall2.y)) {
+                            bullet.a = (540 - bullet.a) % 360;
+                        } 
+                        
                     }
                 }
-                if (wall2 !== undefined) {
-                    
-                    if ((bot < wall2.y2 && (left < wall2.x2 && right > wall2.x)) || (top > wall2.y && (left < wall2.x2 && right > wall2.x))) {
-                        bullet.a = (360 - bullet.a) % 360;
-                    } else if ((right > wall2.x2 && bot > wall2.y2 && top < wall2.y) || (left < wall2.x && bot > wall2.y2 && top < wall2.y)) {
-                        bullet.a = (540 - bullet.a) % 360;
-                    } 
-                    
-                }
-            }
 
-            
-            
-            
+                
+                
+                
+            }
         }
     }
 
@@ -139,22 +117,32 @@ class CollisionManager {
         var player_hit = false;
 
         for (var b_id in bullets) {
+            var bullet_obj = bullets[b_id];
+            var bb = bullet_obj.getBulletArray();
+            for (var id in bb) {
+                var bullet = bb[id];
+                var bullet_v = this.getBulletVertices(bullet); //change to bullet class
+                var bullet_axes = this.getAxes(bullet_v);
+                
 
-            var bullet = bullets[b_id];
-            var bullet_v = this.getBulletVertices(bullet); //change to bullet class
-            var bullet_axes = this.getAxes(bullet_v);
+                for (var p_id in players) {
+                    var player = players[p_id];
+                    var player_vert = this.getPlayerVertices(player); //change to player
+                    var player_axes = this.getAxes(player_vert);
+                    var hit = this.test(player_axes, bullet_axes, player_vert, bullet_v);
+                    if (p_id === bullet_obj.id) {
+                        hit = hit && bullet_obj.player_testable;
+                    } else {
+                        hit = hit && bullet_obj.testable;
+                    }
+                    if (hit) {
+                        delete players[p_id];
+                        bb.splice(id, 1);
+                        player_hit = true;
+                        break;
+                    }
 
-            for (var p_id in players) {
-                var player = players[p_id];
-                var player_vert = this.getPlayerVertices(player); //change to player
-                var player_axes = this.getAxes(player_vert);
-                var hit = this.test(player_axes, bullet_axes, player_vert, bullet_v) && bullet.testable;
-                if (hit) {
-                    delete players[p_id];
-                    bullet.life = 0;
-                    player_hit = true;
                 }
-
             }
         }
         return player_hit;

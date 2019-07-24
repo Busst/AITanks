@@ -12,10 +12,12 @@ class GameManager {
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
         this.bullet_gen = require('./bullet');
+        this.shotgun_gen = require('./shotgun');
         var pp = require('./powerup');
         var cm = require('./CollisionManager');
         this.collision_manager = new cm(grid_size);
         this.power_gen = new pp();
+        
         
         this.players_left = 0;
         this.adding = false;
@@ -78,24 +80,47 @@ class GameManager {
             var m = player.getMove(input);
             player.update(m.forward, m.back, m.left, m.right);
             var b = player.fire(input.fire);
+            
             if (b !== undefined) {
                 console.log('shooting ' + b);
                 if (b === 'default'){
+                    /*
                     this.bullets[this.bullets.length] = new this.bullet_gen(b, id,
                         player.x + Math.cos(player.a * Math.PI / 180) * 10, 
                         player.y + Math.sin(player.a * Math.PI / 180) * 10, 
                         player.a, 3, 4,
                         2);
+                        */
+                    
+                    this.bullets.push(new this.shotgun_gen(b, id,
+                        player.x + Math.cos(player.a * Math.PI / 180) * 10, 
+                        player.y + Math.sin(player.a * Math.PI / 180) * 10, 
+                        player.a, 3, 4,
+                        2));
+                    
                 }
             }
             
             break;
         }
+
+        for (var id in this.bullets) {
+            var bullet = this.bullets[id];
+            bullet.update();
+            if (bullet.decayLife() || bullet.bullet_array.length === 0) {
+                if (this.players[bullet.id] !== undefined) {
+                    this.players[bullet.id].addDefaultBullet();
+                }
+                this.bullets.splice(id, 1);
+            }
+        }
+
         var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps);
         if (player_hit) {
             this.players_left--;
             if (this.players_left <= 1) {
                 this.init(3);
+                this.bullets = [];
             }
         }
 

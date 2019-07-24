@@ -43,6 +43,7 @@
         if (keyPressed === "P") {
             e.addPower = true;
         }
+        
         socket.emit('input', e);
     }
     function keyUpHandler(event) {
@@ -71,7 +72,6 @@
             e.addPower = false;
         }
         
-
         socket.emit('input', e);
     }
     var canvas = document.getElementById('canvas');
@@ -107,13 +107,15 @@
         context.stroke();
 
         for (var id in bullets) {
-            var bullet = bullets[id];
-           
-            context.fillStyle = 'black';
-            context.beginPath();
-            context.arc(bullet.x, bullet.y, bullet.radius, 0, 2 * Math.PI);
-            context.fill();
-            context.stroke();
+            var bullet = bullets[id].bullet_array;
+            for (var b_id in bullet) {
+                var bb = bullet[b_id];
+                context.fillStyle = 'black';
+                context.beginPath();
+                context.arc(bb.x, bb.y, bb.radius, 0, 2 * Math.PI);
+                context.fill();
+                context.stroke();
+            }
             
         }
 
