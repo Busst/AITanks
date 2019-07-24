@@ -138,7 +138,7 @@ class CollisionManager {
                     if (hit) {
                         delete players[p_id];
                         bb.splice(id, 1);
-                        player_hit = true;
+                        player_hit = p_id;
                         break;
                     }
 

@@ -12,7 +12,6 @@ class GameManager {
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
         this.bullet_gen = require('./bullet');
-        this.shotgun_gen = require('./shotgun');
         var pp = require('./powerup');
         var cm = require('./CollisionManager');
         this.collision_manager = new cm(grid_size);
@@ -83,21 +82,26 @@ class GameManager {
             
             if (b !== undefined) {
                 console.log('shooting ' + b);
-                if (b === 'default'){
-                    /*
-                    this.bullets[this.bullets.length] = new this.bullet_gen(b, id,
-                        player.x + Math.cos(player.a * Math.PI / 180) * 10, 
-                        player.y + Math.sin(player.a * Math.PI / 180) * 10, 
-                        player.a, 3, 4,
-                        2);
-                        */
-                    
-                    this.bullets.push(new this.shotgun_gen(b, id,
+                if (b !== 'default'){
+                    var bullet_class;
+                    try {
+                        bullet_class = require("./special_bullets/" + b);
+                    } catch (e) {
+                        console.log("special bullet error");
+                        player.addDefaultBullet();
+                        break;
+                    }
+                    this.bullets.push(new bullet_class(b, id,
                         player.x + Math.cos(player.a * Math.PI / 180) * 10, 
                         player.y + Math.sin(player.a * Math.PI / 180) * 10, 
                         player.a, 3, 4,
                         2));
-                    
+                } else {
+                    this.bullets.push(new this.bullet_gen(b, id,
+                        player.x + Math.cos(player.a * Math.PI / 180) * 10, 
+                        player.y + Math.sin(player.a * Math.PI / 180) * 10, 
+                        player.a, 3, 4,
+                        2));
                 }
             }
             
@@ -117,10 +121,13 @@ class GameManager {
 
         var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps);
         if (player_hit) {
-            this.players_left--;
-            if (this.players_left <= 1) {
-                this.init(3);
-                this.bullets = [];
+            if (this.players[player_hit] !== undefined) {
+                this.players_left--;
+                
+                if (this.players_left <= 1) {
+                    this.init(3);
+                    this.bullets = [];
+                }
             }
         }
 
