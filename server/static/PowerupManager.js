@@ -11,10 +11,9 @@ class PowerupManager {
             "shotgun"
             ];
 
-        this.map = map;
-        console.log(start);
+        map = map;
 
-        
+        this.generatePowerSpawns(map, start);
 
 
     }
@@ -32,10 +31,13 @@ class PowerupManager {
         return false;
     }
 
-    getSpawnArray() {
+    generatePowerSpawns(map, start) {
+        console.log(start);
+        console.log(map);
+
+
 
     }
-
 
 }
 

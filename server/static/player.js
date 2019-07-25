@@ -42,7 +42,6 @@ class player {
     }
 
     fire(input) {
-        
         if (!input || this.curBullet.length === 0) {
             return;
         }
