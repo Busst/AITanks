@@ -18,11 +18,14 @@ class bullet {
         
     }
 
-    decayLife() {
-
+    makePlayerTestable() {
+        
         if (this.max_life - 10 === this.life) {
             this.player_testable = true;
         }
+    }
+    decayLife() {
+        this.makePlayerTestable();
         if (--this.life === 0) {
             return true;
         }

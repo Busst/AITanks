@@ -1,6 +1,6 @@
 'use strict'
 
-var bb = require('./bullet');
+var bb = require('../bullet');
 
 class shotgun extends bb {
 

@@ -88,7 +88,7 @@
         
         context.beginPath();
         context.fillStyle = 'black'
-        context.lineWidth = 1;
+        context.lineWidth = 2;
         
         
         for (var id in map.y_walls) {
@@ -108,14 +108,21 @@
 
         for (var id in bullets) {
             var bullet = bullets[id].bullet_array;
+            if (bullets[id].type === 'bubbles'){
+                context.lineWidth = 3;
+
+            }
             for (var b_id in bullet) {
                 var bb = bullet[b_id];
                 context.fillStyle = 'black';
                 context.beginPath();
                 context.arc(bb.x, bb.y, bb.radius, 0, 2 * Math.PI);
-                context.fill();
+                if (bullets[id].type !== 'bubbles'){
+                    context.fill();
+                }
                 context.stroke();
             }
+            context.lineWidth = 2;
             
         }
 
@@ -126,7 +133,15 @@
             context.beginPath();
             context.translate(player.x, player.y);
             context.rotate(player.a * Math.PI / 180);
-            context.rect(-player.width / 2, - player.height / 2, player.width, player.height);
+            context.rect(-player.width / 2, - player.height / 2, player.width- 2, player.height);
+            context.fill();
+            context.stroke();
+            context.beginPath();
+            context.rect(-2, -player.height / 4, player.width- 8, player.height / 2);
+            context.fill();
+            context.stroke();
+            context.beginPath();
+            context.arc(0, 0, player.height / 3, 0, 2 * Math.PI);
             context.fill();
             context.stroke();
             context.restore();

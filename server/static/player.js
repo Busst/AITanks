@@ -13,6 +13,9 @@ class player {
         this.height = height; 
         this.time = 0;
         this.curBullet = 'default';
+        this.bulletNum = 5;
+        this.fireTimer = 0;
+
         this.alive = true;
         this.lastMove = {};
         
@@ -44,8 +47,19 @@ class player {
             return;
         }
         var temp = this.curBullet;
-        this.curBullet = '';
-        return temp;
+        if (this.bulletNum > 0) {
+            if (this.fireTimer > 0) {
+                return;
+            }
+            this.curBullet = 'default';
+            
+            this.bulletNum--;
+
+            this.fireTimer = 30;
+            
+            return temp;
+        }
+        return;
 
 
     }
@@ -57,7 +71,7 @@ class player {
     }
 
     update(forward, back, left, right) {
-        
+        if (this.fireTimer > 0) {this.fireTimer--;}
         this.moveForward(forward, 0);
         this.moveBack(back, 0);
         this.rotate(right - left);
@@ -74,6 +88,7 @@ class player {
         if (this.curBullet.length === 0 ) {
             this.curBullet = 'default';
         }
+        this.bulletNum++;
     }
 
     addPower(power) {
