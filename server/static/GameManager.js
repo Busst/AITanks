@@ -12,11 +12,9 @@ class GameManager {
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
         this.bullet_gen = require('./bullet');
-        var pp = require('./powerup');
+        
         var cm = require('./CollisionManager');
         this.collision_manager = new cm(grid_size);
-        this.power_gen = new pp();
-        
         
         this.players_left = 0;
         this.adding = false;
@@ -45,6 +43,9 @@ class GameManager {
         this.players[''+2] = new this.player_gen(''+2, this.spawn['p'+2].x*100 + 20, this.spawn['p'+2].y*100+50, 7, 'green', 30, 20);
         this.players[''+i] = new this.player_gen(''+3, this.spawn['p'+3].x*100 + 20, this.spawn['p'+3].y*100+50, 7, 'blue', 30, 20);
 
+        var pm = require('./PowerupManager');
+        this.power_manager = new pm({up_down: this.walls.x_walls, left_right: this.walls.x_walls}, {x: this.spawn['p'+1].x, y: this.spawn['p'+1].y});
+
         
     }
 
@@ -66,11 +67,15 @@ class GameManager {
         }
         if (input.addPower !== undefined && input.addPower) {
             if (!this.adding){
-                this.addPowerUps();
                 this.adding = true;
             }
         } else {
             this.adding = false;
+        }
+
+        if (this.power_manager.update()) {
+            var pow = this.power_manager.getPowerup();
+            this.powerUps.push({pow, x: 250, y: 250});
         }
         
 
@@ -92,8 +97,8 @@ class GameManager {
                         break;
                     }
                     this.bullets.push(new bullet_class(b, id,
-                        player.x + Math.cos(player.a * Math.PI / 180) * 10, 
-                        player.y + Math.sin(player.a * Math.PI / 180) * 10, 
+                        player.x + Math.cos(player.a * Math.PI / 180) * 12, 
+                        player.y + Math.sin(player.a * Math.PI / 180) * 12, 
                         player.a, 3, 4,
                         2));
                 } else {
@@ -121,25 +126,20 @@ class GameManager {
 
         var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps);
         if (player_hit) {
-            if (this.players[player_hit] !== undefined) {
+            
+            if (this.players[player_hit] === undefined) {
                 this.players_left--;
-                
+                console.log(this.players_left);
                 if (this.players_left <= 1) {
                     this.init(3);
                     this.bullets = [];
+                    this.powerUps = [];
                 }
             }
         }
 
     }
 
-    addPowerUps() {
-        console.log("adding powerup");
-        
-        this.powerUps.push({type: 'shotgun', x: 2*100+50, y: 2*100+50});
-        
-
-    }
 
 
 }

@@ -237,10 +237,7 @@ class MapGen {
     }
 
     setSpawns(map) {
-        var start = {
-            x: 4,
-            y: 4
-        }
+        
 
         var p1x = Math.trunc(Math.random() * 7);
         var p1y = Math.trunc(Math.random() * 7);
@@ -278,7 +275,12 @@ class MapGen {
 
 
         while (!this.findPath(p1, p2, open, closed, map)) {
- 
+            if (closed.length >= 3) {
+                p2x = closed[closed.length - 1].x;
+                p2y = closed[closed.length - 1].y;
+                continue;
+            }
+            
             var open = [];
             var closed = [];
             
@@ -299,7 +301,8 @@ class MapGen {
         }
 
         while (!this.findPath(p1, p3, open, closed, map)) {
- 
+
+
             var open = [];
             var closed = [];
             
@@ -325,19 +328,6 @@ class MapGen {
         
     }
 
-    testPath(point) {
-        var x = point.x;
-        var y = point.y;
-
-        if ((x === 0 && y === 1) || (x === 0 && y === 2)) {
-            //return true;
-        }
-        if (y === 0 && x === 1){
-            //return true;
-        }
-       
-        return false;
-    }
 
     findPath(cur, end, open, closed, map, count){
         
@@ -355,7 +345,7 @@ class MapGen {
                 x: cur.x - 1,
                 y: cur.y
             };
-            if (!this.compareTo(p, closed) && !this.compareTo(p, open) && !this.testPath(p)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open)) {
                 open.push(p);
             }
 
@@ -368,7 +358,7 @@ class MapGen {
                 x: cur.x,
                 y: cur.y - 1
             };
-            if (!this.compareTo(p, closed) && !this.compareTo(p, open)  && !this.testPath(p)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open)) {
                 open.push(p);
             }
 
@@ -380,7 +370,7 @@ class MapGen {
                 x: cur.x + 1,
                 y: cur.y
             };
-            if (!this.compareTo(p, closed) && !this.compareTo(p, open) && !this.testPath(p)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open)) {
                 open.push(p);
             }
 
@@ -392,7 +382,7 @@ class MapGen {
                 x: cur.x,
                 y: cur.y + 1
             };
-            if (!this.compareTo(p, closed) && !this.compareTo(p, open) && !this.testPath(p)) {
+            if (!this.compareTo(p, closed) && !this.compareTo(p, open)) {
                 open.push(p);
             }
 

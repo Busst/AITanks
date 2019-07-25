@@ -12,7 +12,7 @@ class player {
         this.width = width;
         this.height = height; 
         this.time = 0;
-        this.curBullet = 'bubbles';
+        this.curBullet = 'default';
         this.bulletNum = 5;
         this.fireTimer = 0;
 
@@ -51,7 +51,7 @@ class player {
             if (this.fireTimer > 0) {
                 return;
             }
-            this.curBullet = 'bubbles';
+            this.curBullet = 'default';
             
             this.bulletNum--;
 

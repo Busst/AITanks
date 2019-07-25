@@ -91,16 +91,31 @@ class CollisionManager {
                     if (wall1 !== undefined) {
                         if ((left > wall1.x2 && (top < wall1.y2 && bot > wall1.y)) || (right < wall1.x && (top < wall1.y2 && bot > wall1.y))) {
                             bullet.a = (540 - bullet.a) % 360;
+                            if (left > wall1.x2) {bullet.x += 1;}
+                            else {bullet.x -= 1;}
                         } else if ((bullet.y > wall1.y && bullet.y > wall1.y2) || (bullet.y < wall1.y && bullet.y < wall1.y2)) {
                             bullet.a = (360 - bullet.a) % 360;
+                            if (bot < wall1.y2) {
+                                bullet.y -= 1;
+                            } else {
+                                bullet.y += 1;
+                            }
+                            
                         }
                     }
                     if (wall2 !== undefined) {
                         
                         if ((bot < wall2.y2 && (left < wall2.x2 && right > wall2.x)) || (top > wall2.y && (left < wall2.x2 && right > wall2.x))) {
                             bullet.a = (360 - bullet.a) % 360;
+                            if (bot < wall2.y2) {
+                                bullet.y -= 1;
+                            } else {
+                                bullet.y += 1;
+                            }
                         } else if ((right > wall2.x2 && bot > wall2.y2 && top < wall2.y) || (left < wall2.x && bot > wall2.y2 && top < wall2.y)) {
                             bullet.a = (540 - bullet.a) % 360;
+                            if (left > wall2.x2) bullet.x += 1;
+                            else bullet.x -= 1;
                         } 
                         
                     }

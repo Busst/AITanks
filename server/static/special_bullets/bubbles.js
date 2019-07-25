@@ -5,7 +5,7 @@ var bb = require('../bullet');
 class bubble extends bb {
 
     constructor (type, id, x, y, a, speed, radius, life) {
-        super (type, id, x, y, a, speed, radius, life + 30);
+        super (type, id, x, y, a, speed, radius, life + 4);
         this.past_moves = [];
         
         
@@ -27,20 +27,18 @@ class bubble extends bb {
     doBubbleShit(bullet) {
         
         var angle = Math.random() * 360 + 360;
-        if (bullet.a > 270) {
-            bullet.a += (angle % 72 - 12) + 360;
-            bullet.a = bullet.a % 360;
-        } else {
-            bullet.a += (angle % 72 - 36);
-        }
+        
+        bullet.a += (angle % 20 - 10) + 360;
+        bullet.a = bullet.a % 360;
+        
     }
     update() {
         this.seed++;
         for (var id in this.bullet_array) {
             if (this.effects()){
                 this.doBubbleShit(this.bullet_array[id]);
-                this.speed = Math.random() * 3;
-                if ( this.bullet_array[id].radius < 8) {
+                this.speed = Math.random() * 2;
+                if ( this.bullet_array[id].radius < 10) {
                     this.bullet_array[id].radius++;
                 }
                 
