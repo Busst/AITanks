@@ -275,7 +275,9 @@ class MapGen {
 
 
         while (!this.findPath(p1, p2, open, closed, map)) {
-            if (closed.length < 3) {console.log("error");}
+            if (closed.length < 3) {
+                console.log("error");
+            }
             
             var open = [];
             var closed = [];
@@ -297,7 +299,9 @@ class MapGen {
         }
 
         while (!this.findPath(p1, p3, open, closed, map)) {
-            if (closed.length < 3) {console.log("error");}
+            if (closed.length < 3) {
+                console.log("error");
+            }
 
             var open = [];
             var closed = [];
@@ -334,9 +338,9 @@ class MapGen {
         if (cur.x === end.x && cur.y === end.y) {
             return true;
         }
-        //var str = "" + this.Key(cur.x, cur.y) + " " + tile+ "\n";
+        
         if (cur.x > 0 && !(tile % 2)) {
-            //str += "\tleft wall " + (tile % 2) + "\n";
+            
             var p = {
                 x: cur.x - 1,
                 y: cur.y
@@ -348,7 +352,6 @@ class MapGen {
         }
 
         if (cur.y > 0 && !((tile >> 1) % 2)) {
-            //str += "\ttop wall " + ((tile >> 1) % 2) + "\n";
             
             var p = {
                 x: cur.x,
@@ -360,7 +363,6 @@ class MapGen {
 
         }
         if (cur.x < this.width - 1 && !((tile >> 2) % 2) ) {
-            //str += "\tright wall " + ((tile >> 2) % 2) + "\n";
             
             var p = {
                 x: cur.x + 1,
@@ -372,7 +374,6 @@ class MapGen {
 
         }
         if (cur.y < this.height - 1 && !((tile >> 3) % 2)) {
-            //str += "\tbot wall " + ((tile >> 3) % 2) + "\n";
             
             var p = {
                 x: cur.x,
@@ -383,13 +384,11 @@ class MapGen {
             }
 
         }
-        //console.log(str);
         closed.push(cur);
         if (open.length === 0) {
             return false;
         }
         var new_cur = open.pop();
-        //console.log(this.stacksToString(open, closed));
         return this.findPath(new_cur, end, open, closed, map, count + 1);
 
     }

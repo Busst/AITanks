@@ -12,7 +12,7 @@ class player {
         this.width = width;
         this.height = height; 
         this.time = 0;
-        this.curBullet = 'default';
+        this.curBullet = 'rocket';
         this.bulletNum = 5;
         this.fireTimer = 0;
 
@@ -42,6 +42,7 @@ class player {
     }
 
     fire(input) {
+        
         if (!input || this.curBullet.length === 0) {
             return;
         }
@@ -50,7 +51,7 @@ class player {
             if (this.fireTimer > 0) {
                 return;
             }
-            this.curBullet = 'default';
+            this.curBullet = 'rocket';
             
             this.bulletNum--;
 
