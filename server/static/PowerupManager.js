@@ -11,7 +11,6 @@ class PowerupManager {
             "shotgun",
             "rocket"
             ];
-
             
         var wallx = map.up_down;
         var wally = map.left_right; 
@@ -22,6 +21,7 @@ class PowerupManager {
         var cur;
         this.getSpawnArray(open, closed, wallx, wally, cur, spawns);
         this.spawns = spawns;
+
 
     }
     getPowerSpawn() {
@@ -97,6 +97,7 @@ class PowerupManager {
         return false;
     }
 
+    }
 
 }
 
