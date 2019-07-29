@@ -91,7 +91,9 @@ class player {
     }
 
     addPower(power) {
+        
         if (this.curBullet === 'default' || this.curBullet.length === 0) {
+            console.log("player " + this.id + " picked up " + power);
             this.curBullet = power;
             return true;
         }

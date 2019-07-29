@@ -8,7 +8,7 @@
 
     document.addEventListener("keydown", keyDownHandler, false);
     document.addEventListener("keyup", keyUpHandler, false);    
-
+    
     var e = {
         forward: false,
         back: false,
@@ -80,6 +80,13 @@
     var context = canvas.getContext('2d');
     
     socket.on('update', function(data) {
+        
+        var events = data.events;
+        if (events['hit']) {
+            var audio = new Audio('./static/assets/explosion.mp3');
+            audio.play();
+        }
+
         var players = data.players;
         var bullets = data.bullets;
         var map = data.map;

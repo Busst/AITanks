@@ -151,7 +151,6 @@ class CollisionManager {
                         hit = hit && bullet_obj.testable;
                     }
                     if (hit) {
-                        console.log(bb[id]);
                         delete players[p_id];
                         bb.splice(id, 1);
                         player_hit = p_id;
@@ -205,7 +204,6 @@ class CollisionManager {
                 var power_axes = this.getAxes(power_v);
                 var hit = this.test(player_axes, power_axes, player_vert, power_v);
                 if (hit) {
-                    console.log(power.pow);
                     if (player.addPower(power.pow)) {
                         powerUps.splice(pw_id, 1);
                     }
