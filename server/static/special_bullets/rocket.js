@@ -11,19 +11,21 @@ class rocket extends bb{
 
     makePlayerTestable() {
         
-        if (this.max_life - 10 === this.life) {
-            //this.player_testable = true;
+        if (this.max_life - 25 === this.life) {
+            this.player_testable = true;
         }
     }
 
     update(wx, wy, ps) {
         var player;
         var test,dis;
+
+        
         
 
         for (var id in this.bullet_array) {
             for (var p_id in ps) {
-                if (this.id === p_id) continue;
+                if (this.id === p_id && !this.player_testable) continue;
                 test = this.getDistance(ps[p_id], this.bullet_array[id]);
                 if (dis === undefined || test < dis){
                     dis = test;
@@ -37,11 +39,17 @@ class rocket extends bb{
         if (dis === undefined) {
             return;
         }
+        
         if (player === undefined) {
             player = {x: 250, y: 250};
         }
         for (var id in this.bullet_array) {
             
+            if (!this.player_testable) {
+                this.bullet_array[id].x += Math.cos(this.bullet_array[id].a * Math.PI / 180) * this.speed;
+                this.bullet_array[id].y += Math.sin(this.bullet_array[id].a * Math.PI / 180) * this.speed;
+                continue;
+            } 
 
             var x = Math.trunc(this.bullet_array[id].x / 100);
             var y = Math.trunc(this.bullet_array[id].y / 100);
@@ -61,37 +69,38 @@ class rocket extends bb{
             };
             var open = [node];
             var visited = [];
-            if (this.life % 20 === 0){
+            if (this.life % 20 === 0 || this.path === undefined){
                 this.pathfinding(open, visited, wx, wy, node, end_node);
                 this.path = this.drawBack(visited[visited.length - 1]);
             }
+            
+            var damp = 12;
             if (this.path.length > 1) {
                 //move along to shorten distance
                 var angle= this.bullet_array[id].a;
                 
                 var fx = this.path[this.path.length - 2].x - x;
                 var fy = this.path[this.path.length - 2].y - y;
-            
                 if (fx < 0) {
                     //180
-                    angle+= (180 - angle) * 1 / 10;
+                    angle+= (180 - angle) * 1 / damp;
                 } else if (fx > 0){
                 // angle+= (0 - angle) * 1 / 4;
                     if (angle > 180) {
-                        angle += (360 - angle)/ 10;
+                        angle += (360 - angle)/ damp;
                         angle = angle % 360;
                         
                     } else {
-                        angle -= angle / 10;
+                        angle -= angle / damp;
                         
                     }
 
                 } if (fy < 0) {
-                    if (angle > 90) angle+= (270 - angle) * 1 / 10;
-                    else angle = 360 - (270 - angle) * 1 / 10;
+                    if (angle > 90) angle+= (270 - angle) * 1 / damp;
+                    else angle = 360 - (270 - angle) * 1 / damp;
                 } else if (fy > 0){
-                    if (angle < 270) angle+= (90 - angle) * 1 / 10;
-                    else angle= -(90 - angle) * 1 / 10;
+                    if (angle < 270) angle+= (90 - angle) * 1 / damp;
+                    else angle= -(90 - angle) * 1 / damp;
                 }
 
                 this.bullet_array[id].a = angle;
@@ -103,12 +112,17 @@ class rocket extends bb{
                 var this_x = this.bullet_array[id].x;
                 var this_y = this.bullet_array[id].y;
                 var slope = (target_y - this_y) / (target_x - this_x);
-                var angle = Math.atan(slope)*180 / Math.PI;
+                var angle = Math.atan(slope)*180 / Math.PI + 360;
+                
                 if (target_x > this_x) {
-                    this.bullet_array[id].a = angle;
+                    
+                    this.bullet_array[id].a = (this.bullet_array[id].a + angle) / 2;
                 } else {
-                    this.bullet_array[id].a = (180 + angle)%360;
+                    angle += 180;
+                    angle = angle % 360;
+                    this.bullet_array[id].a = (this.bullet_array[id].a + angle) / 2;
                 }
+                
 
 
             }

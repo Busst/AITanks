@@ -37,7 +37,7 @@ class PowerupManager {
 
     update() {
         this.timer++;
-        if (this.timer === 500) {
+        if (this.timer === 1000) {
             this.timer = 0;
             return true;
         }

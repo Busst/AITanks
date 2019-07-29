@@ -14,10 +14,14 @@
     app.get('/', function(request, response) {
         response.sendFile(path.join(__dirname, 'index.html'));
     });
+    app.get('/assets', function(request, response) {
+        
+    });
     // Starts the server.
     server.listen(5000, function() {
         console.log('Starting server on port 5000');
     });
+    
     var input;
     // Add the WebSocket handlers
     io.on('connection', function(socket) { 
@@ -34,7 +38,13 @@
     setInterval(function() {
         
         manager.UpdateGame(input);
-        var data = {players: manager.players, map: manager.walls, bullets: manager.bullets, powers: manager.powerUps};
+        var data = {
+            players: manager.players,
+            map: manager.walls,
+            bullets: manager.bullets,
+            powers: manager.powerUps,
+            events: manager.events
+        };
         
         io.emit('update', data);
         

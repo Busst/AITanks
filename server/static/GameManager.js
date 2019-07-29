@@ -9,6 +9,9 @@ class GameManager {
         this.powerUps = [];
         this.map;
         this.walls;
+        this.events = {
+            'hit': false
+        };
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
         this.bullet_gen = require('./bullet');
@@ -18,6 +21,7 @@ class GameManager {
         
         this.players_left = 0;
         this.adding = false;
+        this.wins = {};
 
     }
 
@@ -40,16 +44,23 @@ class GameManager {
         this.players[''+1] = new this.player_gen(''+1, this.spawn['p'+1].x*100 + 50, this.spawn['p'+1].y*100+50, 7, 'red', 30, 20);
         this.players[''+2] = new this.player_gen(''+2, this.spawn['p'+2].x*100 + 50, this.spawn['p'+2].y*100+50, 7, 'green', 30, 20);
         this.players[''+3] = new this.player_gen(''+3, this.spawn['p'+3].x*100 + 50, this.spawn['p'+3].y*100+50, 7, 'blue', 30, 20);
-
+        for (var id in this.players) {
+            this.wins[id] = 0;
+        }
         var pm = require('./PowerupManager');
         this.power_manager = new pm({up_down: this.walls.x_walls, left_right: this.walls.y_walls}, {x: this.spawn['p'+1].x, y: this.spawn['p'+1].y});
         
+        this.game_timer = 250;
         
     }
 
 
 
     UpdateGame(input) {
+
+        if (this.events['hit']) {
+            this.events['hit'] = false;
+        }
         if (input === undefined) {
             input = {
                 forward: false,
@@ -74,7 +85,8 @@ class GameManager {
         if (this.power_manager.update()) {
             var pow = this.power_manager.getPowerup();
             var spawn = this.power_manager.getPowerSpawn();
-            //this.powerUps.push({pow, x: spawn.x*100 + 50, y: spawn.y*100+50});
+            this.powerUps.push({pow, x: spawn.x*100 + 50, y: spawn.y*100+50});
+            console.log(pow + " spawned");
         }
         
 
@@ -132,14 +144,26 @@ class GameManager {
         var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps);
         if (player_hit) {
             console.log("player " + player_hit + " hit");
+
+            this.events['hit'] = true;
             if (this.players[player_hit] === undefined) {
                 this.players_left--;
-                if (this.players_left <= 1) {
-                    this.init(3);
-                    this.bullets = [];
-                    this.powerUps = [];
-                }
             }
+        }
+        if (this.players_left <= 1) {
+            this.game_timer--;
+        }
+        if (this.game_timer === 0) {
+            for (var id in this.players) {
+                this.wins[id]++;
+            }
+            console.log("wins");
+            for (var id in this.wins) {
+                console.log("\tplayer " + id + ": " + this.wins[id]);
+            }
+            this.init(3);
+            this.bullets = [];
+            this.powerUps = [];
         }
 
     }
