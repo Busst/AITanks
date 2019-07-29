@@ -36,16 +36,13 @@ class GameManager {
         console.log("player 2 spawn: {" + this.spawn.p2.x + ", " + this.spawn.p2.y + "}");
         console.log("player 3 spawn: {" + this.spawn.p3.x + ", " + this.spawn.p3.y + "}");
 
-        //for (var i = 1; i <= player_num - 1; i++) {
-            //this.players[''+i] = new this.player_gen(''+i, this.spawn['p'+i].x*100 + 20, this.spawn['p'+i].y*100+50, 7, 'red', 30, 20);
-        //}
         this.players[''+1] = new this.player_gen(''+1, this.spawn['p'+1].x*100 + 50, this.spawn['p'+1].y*100+50, 7, 'red', 30, 20);
         this.players[''+2] = new this.player_gen(''+2, this.spawn['p'+2].x*100 + 50, this.spawn['p'+2].y*100+50, 7, 'green', 30, 20);
         this.players[''+3] = new this.player_gen(''+3, this.spawn['p'+3].x*100 + 50, this.spawn['p'+3].y*100+50, 7, 'blue', 30, 20);
 
         var pm = require('./PowerupManager');
-        this.power_manager = new pm({up_down: this.walls.x_walls, left_right: this.walls.x_walls}, {x: this.spawn['p'+1].x, y: this.spawn['p'+1].y});
-
+        this.power_manager = new pm({up_down: this.walls.x_walls, left_right: this.walls.y_walls}, {x: this.spawn['p'+1].x, y: this.spawn['p'+1].y});
+        
         
     }
 
@@ -72,10 +69,12 @@ class GameManager {
         } else {
             this.adding = false;
         }
-
+        
         if (this.power_manager.update()) {
             var pow = this.power_manager.getPowerup();
-            this.powerUps.push({type: pow, x: 250, y: 250});
+            var spawn = this.power_manager.getPowerSpawn();
+            //this.powerUps.push({pow, x: spawn.x*100 + 50, y: spawn.y*100+50});
+
         }
         
 
@@ -86,8 +85,8 @@ class GameManager {
             var b = player.fire(input.fire);
             
             if (b !== undefined) {
-                console.log(this.powerUps);
-                console.log('shooting ' + b);
+                console.log('player '+ id + ' shooting ' + b);
+
                 if (b !== 'default'){
                     var bullet_class;
                     try {
@@ -95,13 +94,14 @@ class GameManager {
                     } catch (e) {
                         console.log("special bullet error");
                         player.addDefaultBullet();
+                        console.log(e)
                         break;
                     }
                     this.bullets.push(new bullet_class(b, id,
                         player.x + Math.cos(player.a * Math.PI / 180) * 12, 
                         player.y + Math.sin(player.a * Math.PI / 180) * 12, 
                         player.a, 3, 4,
-                        2));
+                        5));
                 } else {
                     this.bullets.push(new this.bullet_gen(b, id,
                         player.x + Math.cos(player.a * Math.PI / 180) * 10, 
@@ -116,7 +116,12 @@ class GameManager {
 
         for (var id in this.bullets) {
             var bullet = this.bullets[id];
-            bullet.update();
+            if (bullet.type !== 'rocket') {
+                bullet.update();
+            } else {
+                bullet.update(this.walls.x_walls, this.walls.y_walls, this.players);
+            }
+            
             if (bullet.decayLife() || bullet.bullet_array.length === 0) {
                 if (this.players[bullet.id] !== undefined) {
                     this.players[bullet.id].addDefaultBullet();
@@ -127,10 +132,9 @@ class GameManager {
 
         var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps);
         if (player_hit) {
-            
+            console.log("player " + player_hit + " hit");
             if (this.players[player_hit] === undefined) {
                 this.players_left--;
-                console.log(this.players_left);
                 if (this.players_left <= 1) {
                     this.init(3);
                     this.bullets = [];
