@@ -239,21 +239,21 @@ class MapGen {
     setSpawns(map) {
         
 
-        var p1x = Math.trunc(Math.random() * 7);
-        var p1y = Math.trunc(Math.random() * 7);
-        var p2x = Math.trunc(Math.random() * 7);
-        var p2y = Math.trunc(Math.random() * 7);
-        var p3x = Math.trunc(Math.random() * 7);
-        var p3y = Math.trunc(Math.random() * 7);
+        var p1x = Math.trunc(Math.random() * this.width);
+        var p1y = Math.trunc(Math.random() * this.width);
+        var p2x = Math.trunc(Math.random() * this.width);
+        var p2y = Math.trunc(Math.random() * this.width);
+        var p3x = Math.trunc(Math.random() * this.width);
+        var p3y = Math.trunc(Math.random() * this.width);
         
         while ((p1x === p2x && p2y === p1y) || (p1x === p3x && p3y === p1y) || (p2x === p3x && p2y === p3y) ) {
                 
             if (p1x === p2x && p2y === p1y) {
-                p2x = Math.trunc(Math.random() * 7);
-                p2y = Math.trunc(Math.random() * 7);
+                p2x = Math.trunc(Math.random() * this.width);
+                p2y = Math.trunc(Math.random() * this.width);
             } else {
-                p3x = Math.trunc(Math.random() * 7);
-                p3y = Math.trunc(Math.random() * 7);
+                p3x = Math.trunc(Math.random() * this.width);
+                p3y = Math.trunc(Math.random() * this.width);
             }
         }
         var p1 = {
@@ -280,12 +280,12 @@ class MapGen {
             var open = [];
             var closed = [];
             
-            p2x = Math.trunc(Math.random() * 7);
-            p2y = Math.trunc(Math.random() * 7);
+            p2x = Math.trunc(Math.random() * this.width);
+            p2y = Math.trunc(Math.random() * this.width);
             while (p1x === p2x && p2y === p1y) {
                 
-                p2x = Math.trunc(Math.random() * 7);
-                p2y = Math.trunc(Math.random() * 7);
+                p2x = Math.trunc(Math.random() * this.width);
+                p2y = Math.trunc(Math.random() * this.width);
             }
             
             p2 = {
@@ -302,12 +302,12 @@ class MapGen {
             var open = [];
             var closed = [];
             
-            p3x = Math.trunc(Math.random() * 7);
-            p3y = Math.trunc(Math.random() * 7);
+            p3x = Math.trunc(Math.random() * this.width);
+            p3y = Math.trunc(Math.random() * this.width);
             while (p1x === p3x && p3y === p1y || p2x === p3x && p2y === p3y) {
                 
-                p3x = Math.trunc(Math.random() * 7);
-                p3y = Math.trunc(Math.random() * 7);
+                p3x = Math.trunc(Math.random() * this.width);
+                p3y = Math.trunc(Math.random() * this.width);
             }
             
             p3 = {

@@ -10,7 +10,10 @@ class GameManager {
         this.map;
         this.walls;
         this.events = {
-            'hit': false
+            'hit': false,
+            'bullet': false,
+            'pow_spawn': false,
+            'pickup': false
         };
         this.map_gen = require('./MapGen');
         this.player_gen = require('./player');
@@ -55,11 +58,14 @@ class GameManager {
 
 
 
-    UpdateGame(input) {
+    UpdateGame(input, ai_input) {
 
-        if (this.events['hit']) {
-            this.events['hit'] = false;
-        }
+        if (this.events['hit']) this.events['hit'] = false;
+        if (this.events['bullet']) this.events['bullet'] = false;
+        if (this.events['pow_spawn']) this.events['pow_spawn'] = false;
+        if (this.events['pickup']) this.events['pickup'] = false;
+        
+        
         if (input === undefined) {
             input = {
                 forward: false,
@@ -86,6 +92,8 @@ class GameManager {
             var spawn = this.power_manager.getPowerSpawn();
 
             this.powerUps.push({pow, x: spawn.x*100 + 50, y: spawn.y*100+50});
+            
+            this.events['pow_spawn'] = true;
             console.log(pow + " spawned");
 
         }
@@ -93,13 +101,18 @@ class GameManager {
 
         for (var id in this.players) {
             var player = this.players[id];
-            var m = player.getMove(input);
+            var m = player.getMove(ai_input);
+            var tt = player.getMove(input);
+            m.forward = m.forward || tt.forward;
+            m.right = m.right || tt.right;
+            m.left = m.left || tt.left;
+            m.back  = m.back || tt.back;
             player.update(m.forward, m.back, m.left, m.right);
             var b = player.fire(input.fire);
             
             if (b !== undefined) {
                 console.log('player '+ id + ' shooting ' + b);
-
+                this.events['bullet'] = true;
                 if (b !== 'default'){
                     var bullet_class;
                     try {
@@ -143,7 +156,7 @@ class GameManager {
             }
         }
 
-        var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps);
+        var player_hit = this.collision_manager.runCollisionDetection(this.players, this.walls, this.bullets, this.powerUps, this.events);
         if (player_hit) {
             console.log("player " + player_hit + " hit");
 
