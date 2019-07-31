@@ -7,11 +7,11 @@ class CollisionManager {
         this.grid_size = grid_size;
     }
 
-    runCollisionDetection(players, walls, bullets, powerUps) {
+    runCollisionDetection(players, walls, bullets, powerUps, events) {
         this.playerCollisions(players, walls);
         this.bulletCollisions(bullets, walls, players);
         var p_hit = this.playerBulletCollisions(players, bullets);
-        this.playerPowerCollision(players, powerUps);
+        this.playerPowerCollision(players, powerUps, events);
         return p_hit;
     }
     
@@ -188,7 +188,7 @@ class CollisionManager {
         vertices1[3] = left;
         return vertices1;
     }
-    playerPowerCollision(players, powerUps) {
+    playerPowerCollision(players, powerUps, events) {
         for (var p_id in players) {
             var player = players[p_id];
             var player_vert = this.getPlayerVertices(player); //change to player
@@ -205,6 +205,7 @@ class CollisionManager {
                 var hit = this.test(player_axes, power_axes, player_vert, power_v);
                 if (hit) {
                     if (player.addPower(power.pow)) {
+                        events['pickup'] = true;
                         powerUps.splice(pw_id, 1);
                     }
                 }
