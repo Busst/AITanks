@@ -8,9 +8,7 @@ class bubble extends bb {
         super (type, id, x, y, a, speed, radius, life + 4);
         this.past_moves = [];
         
-        
-        this.seed = 0;
-        this.random = Math.cos(this.seed);
+    
         for (var i = -2; i <= 2; i++) {
             if (i !== 0)
                 this.bullet_array.push({x, y, a: a + i * 20, radius});
@@ -33,7 +31,6 @@ class bubble extends bb {
         
     }
     update() {
-        this.seed++;
         for (var id in this.bullet_array) {
             if (this.effects()){
                 this.doBubbleShit(this.bullet_array[id]);

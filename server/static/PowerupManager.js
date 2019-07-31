@@ -9,7 +9,8 @@ class PowerupManager {
         this.powers = [
             "bubbles",
             "shotgun",
-            "rocket"
+            "rocket",
+            "mine"
             ];
             
         var wallx = map.up_down;

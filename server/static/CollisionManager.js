@@ -150,11 +150,17 @@ class CollisionManager {
                     } else {
                         hit = hit && bullet_obj.testable;
                     }
+                    
+                    if (hit && bullet_obj.type === 'mine') {
+                        bullet_obj.explode();
+                        continue;
+                    }
                     if (hit) {
                         delete players[p_id];
                         bb.splice(id, 1);
                         player_hit = p_id;
                         break;
+                        
                     }
 
                 }

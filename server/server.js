@@ -30,7 +30,7 @@
         });
     });
 
-    var manager = new game_manager(5);
+    var manager = new game_manager();
     manager.init(3);
     var aiInput = {
         left: false,
