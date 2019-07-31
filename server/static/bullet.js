@@ -12,6 +12,7 @@ class bullet {
         this.collidable = false;
         this.testable = true;
         this.player_testable = false;
+        this.color = 'black';
         
         this.bullet_array = [{x, y, a, radius}];
 

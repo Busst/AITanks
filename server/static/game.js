@@ -131,16 +131,19 @@
             var bullet = bullets[id].bullet_array;
             if (bullets[id].type === 'bubbles'){
                 context.lineWidth = 3;
-
             }
+            
+             
+            context.fillStyle = bullets[id].color;
+
             for (var b_id in bullet) {
                 var bb = bullet[b_id];
-                context.fillStyle = 'black';
                 context.beginPath();
                 context.arc(bb.x*display, bb.y*display, bb.radius*display, 0, 2 * Math.PI);
                 if (bullets[id].type !== 'bubbles'){
                     context.fill();
                 }
+                
                 context.stroke();
             }
             context.lineWidth = 2 * display;

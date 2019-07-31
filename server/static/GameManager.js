@@ -2,8 +2,7 @@
 
 class GameManager {
 
-    constructor (grid_size) {
-        this.grid_size = grid_size;
+    constructor () {
         this.players = {};
         this.bullets = [];
         this.powerUps = [];
@@ -19,9 +18,6 @@ class GameManager {
         this.player_gen = require('./player');
         this.bullet_gen = require('./bullet');
         
-        var cm = require('./CollisionManager');
-        this.collision_manager = new cm(grid_size);
-        
         this.players_left = 0;
         this.adding = false;
         this.wins = {};
@@ -34,7 +30,9 @@ class GameManager {
      */
     init(player_num) {
         var gen = new this.map_gen(this.grid_size, this.grid_size, 4, 100);
-        var map_obj = gen.generate_map();
+        this.grid_size = Math.trunc(Math.random() * 4) + 5 + Math.trunc(Math.random() * 4) - 2;
+        console.log(this.grid_size);
+        var map_obj = gen.generate_map(this.grid_size);
         this.spawn = map_obj.spawn;
         this.walls = map_obj.walls;
         this.players_left = player_num;
@@ -52,6 +50,9 @@ class GameManager {
         var pm = require('./PowerupManager');
         this.power_manager = new pm({up_down: this.walls.x_walls, left_right: this.walls.y_walls}, {x: this.spawn['p'+1].x, y: this.spawn['p'+1].y});
         
+        var cm = require('./CollisionManager');
+        this.collision_manager = new cm(this.grid_size);
+
         this.game_timer = 250;
         
     }
@@ -133,7 +134,7 @@ class GameManager {
                         player.x + Math.cos(player.a * Math.PI / 180) * 10, 
                         player.y + Math.sin(player.a * Math.PI / 180) * 10, 
                         player.a, 3, 4,
-                        2));
+                        3.5));
                 }
             }
             

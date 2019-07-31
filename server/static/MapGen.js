@@ -8,7 +8,9 @@ class MapGen {
         this.wall_width = wall_width;
     }
 
-    generate_map() {
+    generate_map(newlength) {
+        this.height = newlength;
+        this.width = newlength;
         console.log("generating map");
         var map = {};
         for (var i = 0; i < this.width; i++) {
@@ -275,51 +277,26 @@ class MapGen {
 
 
         while (!this.findPath(p1, p2, open, closed, map)) {
-            if (closed.length < 3) {console.log("error");}
-            
-            var open = [];
-            var closed = [];
-            
-            p2x = Math.trunc(Math.random() * this.width);
-            p2y = Math.trunc(Math.random() * this.width);
-            while (p1x === p2x && p2y === p1y) {
-                
-                p2x = Math.trunc(Math.random() * this.width);
-                p2y = Math.trunc(Math.random() * this.width);
+            if (closed.length < 3) {
+                console.log("error: 1");
+                p1x = Math.trunc(Math.random() * this.width);
+                p1y = Math.trunc(Math.random() * this.width);
+                var p1 = {
+                    x: p1x,
+                    y: p1y
+                };
+                closed = [];
+                open = [];
+            } else {
+                break;
             }
             
-            p2 = {
-                x: p2x,
-                y: p2y
-            };
-            
- 
         }
-
-        while (!this.findPath(p1, p3, open, closed, map)) {
-            if (closed.length < 3) {console.log("error");}
-
-            var open = [];
-            var closed = [];
-            
-            p3x = Math.trunc(Math.random() * this.width);
-            p3y = Math.trunc(Math.random() * this.width);
-            while (p1x === p3x && p3y === p1y || p2x === p3x && p2y === p3y) {
-                
-                p3x = Math.trunc(Math.random() * this.width);
-                p3y = Math.trunc(Math.random() * this.width);
-            }
-            
-            p3 = {
-                x: p3x,
-                y: p3y
-            };
-            
- 
-        }
-        
-
-
+        var p2s = Math.trunc(Math.random() * closed.length);
+        p2 = closed[p2s];
+        closed.splice(p2s, 1);
+        p1 = closed.splice(Math.trunc(Math.random() * closed.length), 1)[0];
+        p3 = closed[Math.trunc(Math.random() * closed.length)];
         return {p1, p2, p3};
         
     }
@@ -332,7 +309,7 @@ class MapGen {
         if (tile < 16)
             map[this.Key(cur.x, cur.y)].tile += 16;
         if (cur.x === end.x && cur.y === end.y) {
-            return true;
+            //return true;
         }
         //var str = "" + this.Key(cur.x, cur.y) + " " + tile+ "\n";
         if (cur.x > 0 && !(tile % 2)) {
