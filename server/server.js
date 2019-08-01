@@ -3,11 +3,12 @@
     var http = require('http');
     var path = require('path');
     var socketIO = require('socket.io');
+    var dgram = require('dgram');
     var app = express();
     var server = http.Server(app);
+    
     var io = socketIO(server);
-
-    var net = require('net');
+    var client_server = dgram.createSocket('udp4');
     
     const game_manager = require('./static/GameManager');
     app.set('port', 5000);
@@ -55,26 +56,32 @@
         
         io.emit('update', data);
         
+        
     }, 1000 / 80);
     
     //ai stuff
     var host = '127.0.0.1';
     var port = 5001;
+    client_server.on('listening', function() {
+        var address = client_server.address();
+        console.log('AI Server listening on ' + address.address + ':'+ address.port);
+    });
 
-    net.createServer(function(socket) {
-        
-        socket.on('data', function(data) {
+    client_server.on('message', function(data, remote) {
+        console.log(remote.address + ':' + remote.port +' says ' + data)
+    });
 
-            aiInput.forward = data[0] === 49;
-            aiInput.back = data[1] === 49;
-            aiInput.left = data[2] === 49;
-            aiInput.right = data[3] === 49;
-            aiInput.fire = data[4] === 49;
-            
-            
-        });
-        socket.on('close', function(data) {
-            console.log("connection closed");
-        });
-    }).listen(port, host);
-    console.log("listening on port " + port);
+    client_server.bind(port, host);
+    setInterval(function() {
+
+    }, 1000 / 60);
+
+
+
+
+
+
+
+
+
+
