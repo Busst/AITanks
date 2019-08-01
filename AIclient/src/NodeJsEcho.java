@@ -22,20 +22,35 @@ public class NodeJsEcho {
 
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
         NodeJsEcho client = new NodeJsEcho();
+
         DatagramSocket ds = new DatagramSocket(5002);
         InetAddress localhost = InetAddress.getLocalHost();
         ds.connect(localhost, 5001);
         String h = "Hello World! x2";
         byte[] bb = h.getBytes();
+
         DatagramPacket dd = new DatagramPacket(bb, bb.length, localhost, 5001);
         ds.send(dd);
-
+        byte[] tt = new byte[1024];
+        DatagramPacket rd = new DatagramPacket(tt, tt.length);
+        ds.receive(rd);
+        System.out.println(messageToString(rd.getData()));
         ds.close();
 
-        int port = 5001;
+
+
+        //int port = 5001;
         //Random rr = new Random(1);
 
 
+    }
+
+    private static  String messageToString(byte[] tt) {
+        String out = "";
+        for (int i = 0; i < tt.length; i++) {
+            out += (char)(tt[i]);
+        }
+        return out;
     }
 
     private String getMovement(int gen) {

@@ -61,21 +61,39 @@
     
     //ai stuff
     var host = '127.0.0.1';
+
     var port = 5001;
+    client_server.bind(port, host);
+
     client_server.on('listening', function() {
+
         var address = client_server.address();
         console.log('AI Server listening on ' + address.address + ':'+ address.port);
+
+
     });
+
+
 
     client_server.on('message', function(data, remote) {
-        console.log(remote.address + ':' + remote.port +' says ' + data)
+        console.log(remote.address + ':' + remote.port +' says ' + data);
+        client_server.send("Message receivedddsvdsv", 5002, host, (err) =>{
+            console.log("message sent");
+        });
+
+    });
+    client_server.on('close', function() {
+        console.log("client closed");
     });
 
-    client_server.bind(port, host);
+
+
+
     setInterval(function() {
 
-    }, 1000 / 60);
 
+
+    }, 1000 / 60);
 
 
 
