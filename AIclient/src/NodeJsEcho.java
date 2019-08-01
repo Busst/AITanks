@@ -7,6 +7,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.Scanner;
+
 import java.util.Random;
 
 public class NodeJsEcho {
@@ -17,15 +22,18 @@ public class NodeJsEcho {
 
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
         NodeJsEcho client = new NodeJsEcho();
+        DatagramSocket ds = new DatagramSocket(5002);
+        InetAddress localhost = InetAddress.getLocalHost();
+        ds.connect(localhost, 5001);
+        String h = "Hello World! x2";
+        byte[] bb = h.getBytes();
+        DatagramPacket dd = new DatagramPacket(bb, bb.length, localhost, 5001);
+        ds.send(dd);
 
-        String ip = "127.0.0.1";
+        ds.close();
+
         int port = 5001;
         //Random rr = new Random(1);
-        client.startConnection(ip, port);
-        int rr = 0;
-        int count = 0;
-        client.out.write("11000");
-        client.stopConnection();
 
 
     }
