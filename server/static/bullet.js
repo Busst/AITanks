@@ -45,11 +45,16 @@ class bullet {
         return this.bullet_array;
     }
 
-
-
-
-
-
+    toString() {
+        var out = "";
+        out += this.type;
+        for (var id in this.bullet_array) {
+            var bull = this.bullet_array[id];
+            out += "\n\t(" + bull.x + ", " + bull.y + ") at " + bull.a +" degrees size: " + this.radius;
+        }
+        out+='\n';
+        return out;
+    }
 }
 
 
