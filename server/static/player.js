@@ -145,6 +145,17 @@ class player {
         
         return move;
     }
+    toString() {
+        var out = "";
+        out += "id: " + this.id;
+        out += "\n\t(" + this.x + ", " + this.y + ") at "+this.a + " degrees";
+        out += "\n\theight: " + this.height + " width: " + this.width;
+        out += "\n\t"+this.curBullet + ": " + this.bulletNum+ " / 5 left";
+        out += '\n';
+        return out;
+    }
+    
 }
+
 
 module.exports = player;

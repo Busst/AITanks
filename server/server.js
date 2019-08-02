@@ -3,12 +3,11 @@
     var http = require('http');
     var path = require('path');
     var socketIO = require('socket.io');
-    var dgram = require('dgram');
     var app = express();
     var server = http.Server(app);
     
     var io = socketIO(server);
-    var client_server = dgram.createSocket('udp4');
+    
     
     const game_manager = require('./static/GameManager');
     app.set('port', 5000);
@@ -59,40 +58,45 @@
         
     }, 1000 / 80);
     
-    //ai stuff
-    var host = '127.0.0.1';
+    //ai server
+    var net = require('net');
+    var AI_PORT = 5002;
+    var HOST = '127.0.0.1';
 
-    var port = 5001;
-    client_server.bind(port, host);
+    var dgram = require('dgram');
+    var server = dgram.createSocket('udp4');
 
-    client_server.on('listening', function() {
-
-        var address = client_server.address();
-        console.log('AI Server listening on ' + address.address + ':'+ address.port);
-
-
+    server.on('listening', function() {
+        var address = server.address();
+        console.log('UDP Server listening on ' + address.address + ':' + address.port);
     });
 
-
-
-    client_server.on('message', function(data, remote) {
-        console.log(remote.address + ':' + remote.port +' says ' + data);
-        client_server.send("Message receivedddsvdsv", 5002, host, (err) =>{
-            console.log("message sent");
-        });
-
+    server.on('message', function(message, remote) {
+        console.log(remote.address + ':' + remote.port +' - ' + message);
+        server.send(Buffer.from("Hello from the server"), 6000, 'localhost');
     });
-    client_server.on('close', function() {
-        console.log("client closed");
-    });
+    
 
-
-
-
+    server.bind(AI_PORT, HOST);
+    
     setInterval(function() {
+        var pack = manager.pack;
+        var packagedData = "";
+        if (pack !== undefined) {
+            for (var id in pack){
+                var player_pack = pack[id];
+                packagedData += pack[id].me;
+                packagedData += "::" + pack[id].bullets;
+                packagedData += "::" + pack[id].pickups;
+                packagedData += "::" + pack[id].players;
+                packagedData += "::" + pack[id].walls;
+                packagedData += "\n";
+                break;
+            }
+        }
+        //console.log(packagedData);
 
-
-
+        server.send(Buffer.from(packagedData), 6000, 'localhost');
     }, 1000 / 60);
 
 

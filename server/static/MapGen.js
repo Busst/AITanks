@@ -386,10 +386,7 @@ class MapGen {
         return Math.abs(y1 - y2) + Math.abs(x1 - x2);
     }
 
-
-
-
-
+    
 }
 
 

@@ -26,6 +26,9 @@ class PowerupManager {
 
     }
     getPowerSpawn() {
+        if (this.spawns.length === 0) {
+            return null;
+        }
         var id = Math.trunc(Math.random() * this.spawns.length);
         var spawn = this.spawns[id];
         this.spawns.splice(id, 1);
@@ -43,6 +46,16 @@ class PowerupManager {
             return true;
         }
         return false;
+    }
+
+    toString(power) {
+        var out = power.pow;
+        out += "\n\t(" + power.x + ", "+power.y+')\n';
+
+
+
+
+        return out;
     }
 
 

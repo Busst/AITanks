@@ -5,7 +5,7 @@ var bb = require('../bullet');
 class shotgun extends bb {
 
     constructor (type, id, x, y, a, speed, radius, life) {
-        super (type, id, x, y, a, speed, radius, life);
+        super (type, id, x, y, a, speed, radius, life/4.5);
         
         for (var i = -2; i <= 2; i++) {
             this.bullet_array.push({x, y, a: a + i * 20, radius});

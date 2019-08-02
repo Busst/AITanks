@@ -60,6 +60,8 @@ class GameManager {
 
 
     UpdateGame(input, ai_input) {
+        this.compilePlayerData();
+
 
         if (this.events['hit']) this.events['hit'] = false;
         if (this.events['bullet']) this.events['bullet'] = false;
@@ -91,11 +93,11 @@ class GameManager {
         if (this.power_manager.update()) {
             var pow = this.power_manager.getPowerup();
             var spawn = this.power_manager.getPowerSpawn();
-
-            this.powerUps.push({pow, x: spawn.x*100 + 50, y: spawn.y*100+50});
-            
-            this.events['pow_spawn'] = true;
-            console.log(pow + " spawned");
+            if (spawn !== null){
+                this.powerUps.push({pow, x: spawn.x*100 + 50, y: spawn.y*100+50});
+                this.events['pow_spawn'] = true;
+                console.log(pow + " spawned");
+            }
 
         }
         
@@ -182,6 +184,64 @@ class GameManager {
             this.powerUps = [];
         }
 
+    }
+
+    compilePlayerData() {
+        var pack = {};
+        var bullet_string = "";
+        var power_string = "";
+        var player_string = "";
+        for (var b_id in this.bullets) {
+            var bullet = this.bullets[b_id];
+            bullet_string += bullet.toString();
+        }
+        for (var p_id in this.powerUps) {
+            var power = this.powerUps[p_id];
+            power_string += this.power_manager.toString(power);
+        }
+        for (var p_id in this.players) {
+            var player = this.players[p_id];
+            player_string += player.toString();
+        }
+        for (var id in this.players) {
+            var player = this.players[id];
+            var wall_string = id + '\n' + this.wallsToString(player.x, player.y);
+            pack[id] = {
+                me: player.toString(),
+                walls: wall_string,
+                players: player_string,
+                pickups: power_string,
+                bullets: bullet_string
+            }
+            
+        }
+
+        this.pack = pack;
+    }
+
+    wallsToString(p_x, p_y) {
+        var out = "";
+        var walls_skimmed = [];
+        var x = Math.trunc(p_x / 100);
+        var y = Math.trunc(p_y / 100);
+        
+        for (var i = -1; i < 2; i++) {
+            for (var j = -1; j < 2; j++) {
+                if (x+i >= 0 && x+i <= this.grid_size && y+j >= 0 && y+j <= this.grid_size ) {
+                    walls_skimmed.push(""+(x+i) + (y + j));        
+                }
+            }
+        }
+        for (var id in walls_skimmed) {
+            var wall = this.walls.x_walls[walls_skimmed[id]];
+            if (wall === undefined) {continue;}
+            out += '\t(' + wall.x + ', ' + wall.x2 + ', ' + wall.y + ', ' + wall.y2 + ')\n';
+            wall = this.walls.y_walls[walls_skimmed[id]];
+            if (wall === undefined) {continue;}
+            out += '\t(' + wall.x + ', ' + wall.x2 + ', ' + wall.y + ', ' + wall.y2 + ')\n';
+
+        }
+        return out;
     }
 
 
