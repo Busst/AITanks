@@ -1,8 +1,12 @@
 public class Sigmoid implements ActivationFunction {
     @Override
     public double getOutput(double totalInput) {
-        double out = 0d;
 
-        return out;
+        return 1.0 / (1.0 + Math.pow(Math.E, -totalInput));
+    }
+
+    @Override
+    public double getOutputDerivative(double z) {
+        return (getOutput(z) * (1.0 - getOutput(z)));
     }
 }

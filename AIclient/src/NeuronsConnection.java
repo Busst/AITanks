@@ -17,6 +17,8 @@ public class NeuronsConnection {
      */
     protected double weight;
 
+    private double newWeight;
+
     public NeuronsConnection(Neuron fromNeuron, Neuron toNeuron) {
         this.fromNeuron = fromNeuron;
         this.toNeuron = toNeuron;
@@ -35,7 +37,7 @@ public class NeuronsConnection {
         this.weight = weight;
     }
     public double getInput() {
-        return fromNeuron.calculateOutput();
+        return fromNeuron.getA();
     }
 
     /**
@@ -44,8 +46,24 @@ public class NeuronsConnection {
      * @return weight of the input of the connection
      */
     public double getWeightedInput() {
-        return fromNeuron.calculateOutput() * weight;
+        //System.out.println("Connection:\n\tfromNeuron.A: "+fromNeuron.getA()+"\n\tweight: " + weight);
+        return fromNeuron.getA() * weight;
     }
+
+    public void newWeight(double newWeight) {
+        this.newWeight = newWeight;
+    }
+
+    public double getErrorWeight() {
+        return newWeight;
+    }
+
+    public void resolveWeight(double learning_rate){
+        //System.out.println(weight);
+        this.weight = weight + newWeight * learning_rate;
+        //System.out.println(weight);
+    }
+
 
     public Neuron getFromNeuron() {
         return fromNeuron;

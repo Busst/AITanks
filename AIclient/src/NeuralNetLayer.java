@@ -20,6 +20,10 @@ public class NeuralNetLayer {
         return neurons;
     }
 
+    public void addNeuron(Neuron n) {
+        neurons.add(n);
+    }
+
     @Override
     public String toString() {
         String out = "";

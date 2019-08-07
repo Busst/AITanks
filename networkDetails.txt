@@ -1,0 +1,21 @@
+derivitave of activation funcion: (1 / (1 + e^-z)) * (1 - (1 / (1 + e^-z)))
+
+activation output *
+
+partial derivitave d
+Cost function C
+w weight of connection
+z = sum of input * weight + bias
+a = activation function with z as input
+
+change weights by (reconfirm): dC/dw
+dC/dw = (dz/dw)(da/dz)(dc/da)
+
+C = (a - y)^2				(dC/da) = 2(a(t) - y)
+z = w(t) * a(t-1) + b(t)		(dz/dw) = a(t-1)
+a(t) = activation_function(z(t))	(da/dz) = d(activation_function(z(t)))
+						sigmoid : (1 / (1 + e^-z)) * (1 - (1 / (1 + e^-z)))
+
+
+ex: 
+	
