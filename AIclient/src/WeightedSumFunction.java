@@ -8,8 +8,12 @@ public class WeightedSumFunction implements InputSummingFunction {
     public double getOutput(List<NeuronsConnection> inputConnection) {
         double weightSum = 0d;
         for (NeuronsConnection connection: inputConnection) {
-            weightSum += connection.getWeightedInput();
+            double temp = weightSum;
+            double addAmount = connection.getWeightedInput();
+            //System.out.println("adding "  + addAmount +" to " + temp);
+            weightSum += addAmount;
         }
+        //System.out.println("total: " + weightSum);
         return weightSum;
     }
 }
