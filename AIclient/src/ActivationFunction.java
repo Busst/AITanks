@@ -1,5 +1,6 @@
 public interface ActivationFunction {
-    double getOutput(double totalInput);
 
-    double getOutputDerivative(double z);
+    public double getActivation(double z);
+    public double getDerivative(double z);
+
 }
