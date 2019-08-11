@@ -1,75 +1,73 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Test {
 
     public static void main(String[] args) {
-        /**
-         * neural network model
-         * list of node's doesn't matter at first since we can assign connections later
-         * list of connections, also can assign later
-         * need input node, input node has as many connections as next layer nodes
-         */
-
-        List<Neuron> input = new ArrayList<>();
-        input.add(new InputNeuron(0));
-        input.add(new InputNeuron(0));
-
-        NeuralNetLayer inputLayer = new NeuralNetLayer("input Layer", input);
-        List<NeuralNetLayer> hiddenLayers = new ArrayList<>();
-        for (int k = 0; k < 5; k++) {
-            List<Neuron> hiddenLayerList1 = new ArrayList<>();
-            for (int i = 0; i < 100; i++) {
-                hiddenLayerList1.add(new Neuron());
-            }
-            NeuralNetLayer hiddenLayer1 = new NeuralNetLayer("hidden layer 1", hiddenLayerList1);
-            hiddenLayers.add(hiddenLayer1);
-        }
-
-        List<Neuron> outputLayerList = new ArrayList<>();
-        outputLayerList.add(new Neuron());
-        NeuralNetLayer outputLayer = new NeuralNetLayer("output layer", outputLayerList);
-
-        NeuralNet ann = new NeuralNet("ann", inputLayer, hiddenLayers, outputLayer, false);
-        List<Double> output= ann.feedForward();
-        for (Double d: output) {
-            System.out.println(d);
-        }
+        Net ann = new Net();
+        //System.out.println(ann.toString());
+        List<Double> data = new ArrayList<>();
         List<Double> expected = new ArrayList<>();
-        List<Double> input1 = new ArrayList<>();
-        input1.add(0d);
-        input1.add(0d);
-
         expected.add(0d);
-        for (int i = 0; i < 200; i++) {
-            expected.set(0,0d);
-            output = ann.feedForward();
-            ann.backPropagate(expected);
-            for (Double d: output) {
-                System.out.println(d);
+        data.add(1d);data.add(1d);
+        ann.feedForward(data);
+        System.out.println("****************************************");
+        System.out.println(ann.toString());
+        ann.backpropagate(expected);
+        ann.feedForward(data);
+        /*
+        data = new ArrayList<>();
+        data.add(0d);data.add(0d);
+        ann.feedForward(data);
+        */
+        System.out.println("****************************************");
+        for (int i =0; i < 5000; i++) {
+            expected = new ArrayList<>();
+            expected.add(0d);
+            data = new ArrayList<>();
+            data.add(1d);data.add(1d);
+            ann.backpropagate(expected);
+            ann.feedForward(data);
+
+            expected = new ArrayList<>();
+            expected.add(1d);
+            data = new ArrayList<>();
+            data.add(1d);data.add(0d);
+            ann.backpropagate(expected);
+            ann.feedForward(data);
+
+            expected = new ArrayList<>();
+            expected.add(1d);
+            data = new ArrayList<>();
+            data.add(0d);data.add(1d);
+            ann.backpropagate(expected);
+            ann.feedForward(data);
+
+            expected = new ArrayList<>();
+            expected.add(0d);
+            data = new ArrayList<>();
+            data.add(0d);data.add(0d);
+            ann.backpropagate(expected);
+            ann.feedForward(data);
+        }
+
+        System.out.println(ann.toString());
+
+        Scanner in = new Scanner(System.in);
+        String line = "";
+        while (true) {
+            line = in.nextLine();
+            if (line.equals("quit")) break;
+            String[] sp = line.split(" ");
+            data = new ArrayList<>();
+            for (int i = 0; i < sp.length; i++) {
+                data.add(Double.parseDouble(sp[i]));
             }
+            ann.feedForward(data);
+            System.out.println(ann.toString());
         }
 
-        System.out.println("**********************************************************");
-        output= ann.feedForward();
-        for (Double d: output) {
-            System.out.println(d);
-        }
-        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        System.out.println("**********************************************************");
-        List<Double> inn = new ArrayList<>();
-        inn.add(1d);
-        inn.add(1d);
-        ann.setInputs(inn);
-        output= ann.feedForward();
-        for (int i = 0; i < 100; i++) {
-            //ann.backPropagate(expected);
-        }
-        for (Double d: output) {
-            System.out.println(d);
-        }
-
+        in.close();
     }
-
-
 }
