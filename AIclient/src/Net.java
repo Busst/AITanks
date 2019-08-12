@@ -12,7 +12,7 @@ public class Net {
         //create new net
         inputLayer = new NodeLayer(2, true);
         hiddenLayers = new ArrayList<>();
-        hiddenLayers.add(new NodeLayer(2, false, inputLayer));
+        hiddenLayers.add(new NodeLayer(4, false, inputLayer));
         outputLayer = new NodeLayer(1, false, hiddenLayers.get(0));
     }
     public Net(NodeLayer inputLayer, NodeLayer outputLayer){
@@ -39,13 +39,14 @@ public class Net {
             double expected = expect.get(i);
             for (Connection c: n.getInputConnection()) {
                 firstLayerPropagation(n, expected, c);
-                //System.out.println("error: "+c.getError());
+                System.out.println("error: "+c.getError());
             }
         }
         for(NodeLayer nl: hiddenLayers) {
             for (Node n: nl.getLayer()) {
                 for (Connection c: n.getInputConnection()) {
                     hiddenLayerPropagation(n, c);
+                    System.out.println("error: "+c.getError());
                 }
             }
         }
@@ -67,21 +68,22 @@ public class Net {
     }
 
     public void firstLayerPropagation(Node node, double expected, Connection input){
-        double de_da = -2*(expected - node.getA());
+        double de_da = (node.getA() - expected);
         double da_dz = node.getDerivative();
         double dz_dw = input.getUnweightedInput();
-        input.setError(de_da * da_dz /* dz_dw*/);
+        input.setError(de_da * da_dz * dz_dw, de_da * da_dz);
+
     }
 
     public void hiddenLayerPropagation(Node node, Connection input){
         double de_da = 0d;
         for (Connection c: node.getOutputConnection()){
-            double temp = c.getError() * c.getWeight();
+            double temp = c.getSigma_thing() * c.getWeight();
             de_da += temp;
         }
         double da_dz = node.getDerivative();
         double dz_dw = input.getUnweightedInput();
-        input.setError(de_da * da_dz /* dz_dw*/);
+        input.setError(de_da * da_dz * dz_dw, de_da * da_dz);
 
     }
 

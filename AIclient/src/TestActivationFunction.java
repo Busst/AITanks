@@ -6,6 +6,6 @@ public class TestActivationFunction implements ActivationFunction {
 
     @Override
     public double getDerivative(double z) {
-        return 1;
+        return (z > 0) ? 1 : 0;
     }
 }

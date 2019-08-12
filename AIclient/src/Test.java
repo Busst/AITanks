@@ -24,32 +24,32 @@ public class Test {
         System.out.println("****************************************");
         for (int i =0; i < 5000; i++) {
             expected = new ArrayList<>();
-            expected.add(0d);
-            data = new ArrayList<>();
-            data.add(1d);data.add(1d);
-            ann.backpropagate(expected);
-            ann.feedForward(data);
-
-            expected = new ArrayList<>();
             expected.add(1d);
             data = new ArrayList<>();
             data.add(1d);data.add(0d);
-            ann.backpropagate(expected);
             ann.feedForward(data);
+            ann.backpropagate(expected);
+
+            expected = new ArrayList<>();
+            expected.add(0d);
+            data = new ArrayList<>();
+            data.add(1d);data.add(1d);
+            ann.feedForward(data);
+            ann.backpropagate(expected);
 
             expected = new ArrayList<>();
             expected.add(1d);
             data = new ArrayList<>();
             data.add(0d);data.add(1d);
-            ann.backpropagate(expected);
             ann.feedForward(data);
+            ann.backpropagate(expected);
 
             expected = new ArrayList<>();
             expected.add(0d);
             data = new ArrayList<>();
             data.add(0d);data.add(0d);
-            ann.backpropagate(expected);
             ann.feedForward(data);
+            ann.backpropagate(expected);
         }
 
         System.out.println(ann.toString());
