@@ -16,8 +16,9 @@ public class Node {
     //private ActivationFunction activationFunction;
 
     public Node() {
-        this.bias = 0d;//Math.random() * 5 - 2.5;
-        activationFunction = new TestActivationFunction();
+        this.bias = Math.random() * 2;
+        //activationFunction = new TestActivationFunction();
+        activationFunction = new Softplus();
         outputConnection = new ArrayList<>();
         inputConnection = new ArrayList<>();
     }

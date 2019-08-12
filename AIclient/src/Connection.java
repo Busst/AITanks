@@ -6,9 +6,10 @@ public class Connection {
 
     private Boolean resolved;
     private double error;
+    private double sigma_thing = 0d;
 
     public Connection() {
-        weight = Math.random()*5 - 2.5;
+        weight = Math.random()*2;
         resolved = true;
         error = 0d;
     }
@@ -30,8 +31,9 @@ public class Connection {
         return strength;
     }
 
-    public void setError(double error) {
+    public void setError(double error, double sig) {
         this.error = error;
+        this.sigma_thing = sig;
         resolved = false;
     }
 
@@ -40,6 +42,9 @@ public class Connection {
         resolved = true;
     }
 
+    public double getSigma_thing() {
+        return sigma_thing;
+    }
 
     public double getError() {
         return error;
